@@ -1,6 +1,6 @@
 # Progress and handoff
 
-_Last updated on 2026-11-21 while preparing the release-hardening pull request from `e569f80`._
+_Last updated on 2026-11-21 after creating a dedicated Supabase project for Together._
 
 ## Start here
 
@@ -23,11 +23,26 @@ committed contract. This slice covers explicit Food sharing (PRD §§4.2 and 5),
 
 ## Next pickup
 
-1. Run the updated database integration and Playwright suites with a disposable Supabase stack,
-   including the new visibility and large-export regressions. Verify CLI logical backup and restore
-   with synthetic accounts in a fresh disposable target.
-2. Follow the release checklist. Apply migration `…0800` before the new frontend is made live.
-   Do the preview smoke test with two test accounts before entering personal records.
+The release changes are in [pull request #1](https://github.com/blokx531/together/pull/1) from
+`release-hardening` into `main`. [GitHub Actions](https://github.com/blokx531/together/actions/runs/44879458111)
+passed for `7e79568`, including the Supabase integration suite and authenticated Playwright tests.
+The pull request is open. The dedicated [Together project](https://supabase.com/dashboard/project/kffsxjpmomnupnmbsrkx)
+is healthy in Mumbai under the Nitin organization. Supabase quoted ₹0 per month. All hosted work
+must target project ref `kffsxjpmomnupnmbsrkx`. The other Supabase projects are out of scope.
+
+The [recovery rehearsal](https://github.com/blokx531/together/actions/runs/44880445928) passed on an
+isolated branch. It dumped app and Auth data from one disposable local stack and restored it into
+a newly initialized stack. Sign-in, both members, exact shared balance, and meal visibility passed.
+
+All nine migrations are applied to the dedicated project and the version history matches the repo.
+The hosted project initially issued broad default grants to browser roles. Migration `…0900`
+restores the intended table and column grants. Verified on the new project that all 23 app tables
+have RLS, zero app tables allow anonymous reads, and signed-in users cannot select invitation hashes.
+The project has the 179 catalog foods and zero app accounts.
+
+1. Verify the updated pull request CI, then merge the tested changes before connecting the site.
+2. Complete the Cloudflare sign-in handoff and configure the new Together project for the website.
+   Use two test accounts for the preview smoke before adding personal records.
 3. Continue the PRD backlog after the core release. Saved recipes, favorites, and edit/move controls
    for whole meals remain open. The current daily copy calls one transaction per meal.
 
@@ -63,10 +78,9 @@ Read [AGENTS.md](../AGENTS.md) before implementation. [Architecture](architectur
 - Edge on phone and desktop viewports passed the Food audience and conflict/retry smoke with controlled
   API responses. The checked-in PWA manifest and offline-shell tests passed all four browser cases
   through the dedicated Playwright preview using Edge.
-- Full-stack integration stopped at local Supabase setup because this Windows workspace lacks Docker
-  and the native CLI binary. The authenticated Playwright journeys and CLI backup/restore rehearsal
-  require separate verification. The pull request's GitHub Actions run is the full-stack gate for
-  this slice.
+- This Windows workspace lacks Docker and the native Supabase CLI binary. GitHub Actions verified
+  the original release branch and ran the disposable recovery rehearsal. The permission migration
+  also passed against hosted-style default grants in local PostgreSQL 18.7 and on the new project.
 
 ### Baseline before this slice
 
@@ -89,7 +103,7 @@ Read [AGENTS.md](../AGENTS.md) before implementation. [Architecture](architectur
 ## Release checklist
 
 1. Protect `main` and require the CI check before enabling production deploys.
-2. Create the Supabase free project. Turn off email confirmation as recorded in
+2. Use the dedicated Together Supabase project identified above. Turn off email confirmation as recorded in
    [ADR 0002](decisions/0002-auth-without-email.md). Link the intended project and push migrations
    with `npx supabase link --project-ref <ref>` and `npx supabase db push`.
 3. Connect Cloudflare Pages to the repo, build with `npm run build`, and serve `dist`. Provide

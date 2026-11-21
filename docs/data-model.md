@@ -4,6 +4,10 @@ All tables live in `public`, have RLS enabled, and are granted to `authenticated
 has no table privileges). Helper functions used by policies live in the non-exposed `private` schema and are
 `SECURITY DEFINER` with an empty `search_path`. Migrations: `supabase/migrations/`.
 
+Migration `…0900` removes automatic table privileges for browser roles on hosted projects and
+reapplies the app's explicit table and column grants. It also removes the automatic defaults for
+future public tables created by the application migration role.
+
 ## Ownership vocabulary
 
 | Term                       | Meaning                                                        |
