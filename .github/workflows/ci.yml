@@ -1,7 +1,5 @@
 # Quality gates for every push and pull request. Integration and E2E tests run against a
 # disposable local Supabase stack started inside the runner; no hosted project is ever touched.
-# Note: while this project lives in the `together/` folder of another repository, GitHub does not
-# pick up this file. It activates once the folder becomes the root of its own repository.
 name: CI
 
 on:

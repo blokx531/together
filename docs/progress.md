@@ -4,8 +4,7 @@ _Last updated: 2026-11-21 (cloud session, built without a laptop or browser acce
 
 ## Where things are
 
-The project lives in `together/` inside the `practice` repository until it moves to its own repository
-([ADR 0001](decisions/0001-project-location.md)). Branch: `claude/cloud-foundation-setup-jtqxg9`.
+The project has its own repository (see [ADR 0001](decisions/0001-project-location.md)); default branch `main`.
 
 | Phase                        | Status                                                                                                                                                        |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -21,12 +20,8 @@ The project lives in `together/` inside the `practice` repository until it moves
 
 ## Needs a human (laptop + browser)
 
-1. **GitHub access:** pushes from the cloud session were refused (Claude GitHub App not authorised for
-   `blokx531/practice`). Fix at https://claude.ai/customize/connectors (reconnect GitHub) and/or install the app at
-   https://github.com/apps/claude/installations/select_target, then push the branch.
-2. **Move to its own repository:** create an empty repo (e.g. `together`), then from `practice`:
-   `git subtree split --prefix together -b together-main && git push <new-remote> together-main:main`. CI starts
-   running there.
+1. Check that the first CI run on GitHub Actions is green (it starts a local Supabase inside the runner).
+2. Protect `main` (require the CI check) once deploys are wired up.
 3. **Supabase:** create a free project; Auth → turn **off** "Confirm email"; `npx supabase link --project-ref <ref>`
    and `npx supabase db push` (applies all migrations, including the food catalog).
 4. **Cloudflare Pages:** connect the repo, build `npm run build`, output `dist`, env `VITE_SUPABASE_URL` and
@@ -49,7 +44,6 @@ The project lives in `together/` inside the `practice` repository until it moves
 ## Resume locally
 
 ```bash
-cd together
 npm ci
 npm run db:start                     # Docker required
 npx supabase status -o env           # copy API_URL + PUBLISHABLE_KEY into .env.local (see .env.example)
