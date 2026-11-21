@@ -1,0 +1,19 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
+.DS_Store
+
+# Local environment files hold project URLs/keys; only the example is committed.
+.env
+.env.*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp
+supabase/.branches
+
+# Cloudflare local state
+.wrangler
