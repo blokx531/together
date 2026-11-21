@@ -23,5 +23,10 @@ provider emails about plan changes.
 - **Pausing:** daily use by two people is normally enough activity. If the owner gets Supabase's pause warning
   email, opening the app (or the dashboard) once resumes activity; a paused project is restored via
   _Dashboard → Resume project_.
-- **Backups:** the Free plan has none. Use Settings → "Export my data" (JSON) and Money → CSV export, or
-  `npx supabase db dump --linked -f backup.sql` from a laptop, and store dumps privately (they contain personal data).
+- **Data copies:** use Settings → “Export my data” for an RLS-scoped JSON archive or the Money page
+  for CSV. Export when both partners are done editing. The download reads tables in separate requests.
+- **Disaster recovery:** follow the [Supabase CLI backup and restore procedure](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore)
+  for roles, schema, and data, including Auth accounts. Apply custom Auth objects from versioned
+  migrations as required and configure Auth settings separately. Keep dumps encrypted outside the
+  repository. Rehearse with synthetic users in a fresh disposable Supabase project, then verify
+  both accounts, household pairing, shared balances, and private meal visibility after restoration.

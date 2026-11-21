@@ -20,6 +20,7 @@ describe('profiles', () => {
     expect(error).toBeNull();
     expect(data?.display_name).toBe('Meera');
     expect(data?.time_zone).toBe('Asia/Kolkata');
+    expect(data?.default_meal_visibility).toBe('private');
     expect(Object.keys(data ?? {})).not.toContain('email');
   });
 

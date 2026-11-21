@@ -1,12 +1,20 @@
 import { expect, test, type Page } from '@playwright/test';
 import { pairTwoPeople } from './support';
 
-async function logFood(page: Page, meal: string, search: string, foodButton: RegExp, servings = 1) {
+async function logFood(
+  page: Page,
+  meal: string,
+  search: string,
+  foodButton: RegExp,
+  servings = 1,
+  share = false,
+) {
   await page.getByRole('button', { name: `Add food to ${meal}` }).click();
   const sheet = page.getByRole('dialog', { name: 'Add food' });
   await sheet.getByRole('searchbox', { name: 'Search foods' }).fill(search);
   await sheet.getByRole('button', { name: foodButton }).first().click();
   for (let i = 1; i < servings; i += 1) await sheet.getByRole('button', { name: 'More' }).click();
+  if (share) await sheet.getByText('Both', { exact: true }).click();
   await sheet.getByRole('button', { name: `Add to ${meal.toLowerCase()}` }).click();
   await expect(sheet.getByRole('searchbox', { name: 'Search foods' })).toBeVisible();
   await sheet.getByRole('button', { name: 'Close' }).click();
@@ -19,7 +27,7 @@ test('log 2 rotis + dal tadka + rice without AI; partner sees the meal and total
   const { a, b } = await pairTwoPeople(browser);
   await a.goto('/food');
   // "chapati" finds Roti through its alias.
-  await logFood(a, 'Lunch', 'chapati', /^Roti · home-style/, 2);
+  await logFood(a, 'Lunch', 'chapati', /^Roti · home-style/, 2, true);
   await logFood(a, 'Lunch', 'daal tadka', /^Dal tadka · home-style/);
   await logFood(a, 'Lunch', 'rice', /^Rice · home-style/);
 
@@ -63,15 +71,26 @@ test('private meals stay hidden from the partner', async ({ browser }) => {
   const sheet = a.getByRole('dialog', { name: 'Add food' });
   await sheet.getByRole('searchbox', { name: 'Search foods' }).fill('samosa');
   await sheet.getByRole('button', { name: /^Samosa · home-style/ }).click();
-  await sheet.getByText('Only me').click();
+  await expect(sheet.getByRole('radio', { name: 'Only me' })).toBeChecked();
   await sheet.getByRole('button', { name: 'Add to snacks' }).click();
+  await sheet.getByRole('searchbox', { name: 'Search foods' }).fill('idli');
+  await sheet
+    .getByRole('button', { name: /^Idli · home-style/ })
+    .first()
+    .click();
+  await expect(sheet.getByText('Visible to only you')).toBeVisible();
+  await expect(sheet.getByRole('radio', { name: 'Both' })).toHaveCount(0);
+  await sheet.getByRole('button', { name: 'Add to snacks' }).click();
+  await expect(sheet.getByRole('searchbox', { name: 'Search foods' })).toBeVisible();
   await sheet.getByRole('button', { name: 'Close' }).click();
   await expect(a.getByRole('region', { name: 'Snacks' })).toContainText('Samosa');
+  await expect(a.getByRole('region', { name: 'Snacks' })).toContainText('Idli');
 
   await b.goto('/food');
   await b.getByText('Asha', { exact: true }).click();
   await expect(b.getByRole('region', { name: "Asha's day" })).toContainText('0 kcal');
   await expect(b.getByText('Samosa')).toHaveCount(0);
+  await expect(b.getByText('Idli')).toHaveCount(0);
 });
 
 test('weigh-ins and goals: private by default, chart updates, sharing is explicit', async ({

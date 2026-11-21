@@ -104,6 +104,9 @@ client loaded (`STALE_EXPENSE` otherwise). `voided_by` is always set to the call
   item has them.
 - **RPCs:** `log_food` (idempotent), `copy_meal` (idempotent via uuid v5 of request id + item id), `move_meal` (merges),
   `set_day_complete`, `my_daily_intake(from, to)` (days with no food are absent, never zero).
+- **Visibility (migration `…0800`):** new profiles default to private meals. An existing meal keeps
+  its saved audience when adding food. Log, copy, and move reject a destination with a different
+  audience, and the database holds the destination row lock until the write completes.
 
 ## Weight & goals (migration `…0600_weight_goals.sql`)
 

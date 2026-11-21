@@ -105,6 +105,36 @@ describe('meal logging', () => {
     expect((await b.client.from('meal_items').select('id')).data).toEqual([]);
   });
 
+  it('rejects a write when an existing meal has a different audience', async () => {
+    const { a, b } = await createPair();
+    const roti = await catalogFoodId(a, 'roti:home');
+    const lunch = { foodId: roti, quantity: 40 };
+    expect((await logFood(a, lunch)).error).toBeNull();
+    expectDbError(await logFood(a, { ...lunch, visibility: 'private' }), 'STALE_MEAL_VISIBILITY');
+    expect(await dayTotal(a, a.id)).toBe(102);
+    expect(await dayTotal(b, a.id)).toBe(102);
+
+    const dinner = { ...lunch, mealType: 'dinner' };
+    expect((await logFood(a, { ...dinner, visibility: 'private' })).error).toBeNull();
+    expectDbError(await logFood(a, dinner), 'STALE_MEAL_VISIBILITY');
+    expect(await dayTotal(a, a.id)).toBe(204);
+    expect(await dayTotal(b, a.id)).toBe(102);
+  });
+
+  it('saves only one of two simultaneous requests with conflicting meal visibility', async () => {
+    const { a, b } = await createPair();
+    const roti = await catalogFoodId(a, 'roti:home');
+    const [shared, personal] = await Promise.all([
+      logFood(a, { foodId: roti, quantity: 40, visibility: 'household' }),
+      logFood(a, { foodId: roti, quantity: 40, visibility: 'private' }),
+    ]);
+    const [saved, rejected] = shared.error ? [personal, shared] : [shared, personal];
+    expect(saved.error).toBeNull();
+    expectDbError(rejected, 'STALE_MEAL_VISIBILITY');
+    expect(await dayTotal(a, a.id)).toBe(102);
+    expect(await dayTotal(b, a.id)).toBe(shared.error ? 0 : 102);
+  });
+
   it('drops duplicate submissions', async () => {
     const { a } = await createPair();
     const idli = await catalogFoodId(a, 'idli:home');
@@ -224,6 +254,45 @@ describe('meal logging', () => {
       .eq('local_date', '2026-11-21');
     expect(meals.data).toHaveLength(1);
     expect(meals.data?.[0]?.meal_items).toHaveLength(3);
+  });
+
+  it('leaves private items intact when copy or move targets a shared meal', async () => {
+    const { a, b } = await createPair();
+    const roti = await catalogFoodId(a, 'roti:home');
+    const localDate = '2026-11-20';
+    expect(
+      (await logFood(a, { foodId: roti, quantity: 40, date: localDate, visibility: 'private' }))
+        .error,
+    ).toBeNull();
+    expect((await logFood(a, { foodId: roti, quantity: 80 })).error).toBeNull();
+    const { data: source, error } = await a.client
+      .from('meals')
+      .select('id')
+      .eq('local_date', localDate)
+      .single();
+    if (error) throw error;
+    const target = {
+      p_target_date: '2026-11-21',
+      p_target_meal_type: 'lunch',
+      p_target_custom_label: '',
+    };
+
+    expectDbError(
+      await a.client.rpc('copy_meal', {
+        ...target,
+        p_source_meal_id: source.id,
+        p_request_id: randomUUID(),
+      }),
+      'STALE_MEAL_VISIBILITY',
+    );
+    expectDbError(
+      await a.client.rpc('move_meal', { ...target, p_meal_id: source.id }),
+      'STALE_MEAL_VISIBILITY',
+    );
+
+    expect(await dayTotal(a, a.id, localDate)).toBe(102);
+    expect(await dayTotal(b, a.id, localDate)).toBe(0);
+    expect(await dayTotal(b, a.id)).toBe(204);
   });
 
   it('removes a meal when its last item is deleted, and tracks day completeness', async () => {

@@ -64,8 +64,9 @@ Useful database commands:
 | `npm run test:e2e`         | Playwright on the production build, phone + desktop viewports  |
 | `npm run build`            | Typecheck + production build                                   |
 
-Integration and E2E tests refuse to run against anything but `127.0.0.1`/`localhost`.
-For E2E, Playwright needs Chromium: `npx playwright install chromium` (once).
+Integration and E2E tests require loopback Supabase endpoints. E2E reads the production-mode Vite
+settings, normally from `.env.local`, and starts its own preview on port 4173. For E2E, install Chromium
+once with `npx playwright install chromium`.
 
 ## Deploying (needs a browser and accounts — not automated yet)
 
