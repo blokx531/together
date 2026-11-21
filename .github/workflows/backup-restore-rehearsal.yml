@@ -1,0 +1,53 @@
+name: Together backup and restore rehearsal
+
+on:
+  push:
+    branches: [backup-restore-rehearsal]
+
+permissions:
+  contents: read
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Round-trip a backup between disposable Supabase stacks
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_ACTIONS" = true
+          db_container=supabase_db_together
+          fixture="$RUNNER_TEMP/together-restore-fixture.json"
+          dump="$RUNNER_TEMP/together-restore-data.sql"
+          trap 'rm -f -- "$fixture" "$dump"' EXIT
+          umask 077
+
+          npm run db:start
+          eval "$(npx supabase status -o env)"
+          export API_URL PUBLISHABLE_KEY SECRET_KEY
+          node scripts/rehearse-backup.mjs seed "$fixture"
+          source_id="$(docker inspect --format '{{.Id}}' "$db_container")"
+          docker exec "$db_container" pg_dump -U postgres -d postgres --data-only \
+            --table='public.*' --table=auth.users --table=auth.identities > "$dump"
+          test -s "$dump"
+
+          npx supabase stop --no-backup
+          npm run db:start
+          target_id="$(docker inspect --format '{{.Id}}' "$db_container")"
+          test "$source_id" != "$target_id"
+          test "$(docker exec "$db_container" psql -U postgres -d postgres -Atqc 'select count(*) from auth.users')" = 0
+          test "$(docker exec "$db_container" psql -U postgres -d postgres -Atqc 'select count(*) from public.households')" = 0
+
+          docker exec -i "$db_container" psql -U postgres -d postgres -X --quiet \
+            --set ON_ERROR_STOP=1 --single-transaction \
+            -c 'set session_replication_role = replica' \
+            -c 'truncate table public.food_sources cascade' -f - < "$dump"
+          eval "$(npx supabase status -o env)"
+          node scripts/rehearse-backup.mjs verify "$fixture"
