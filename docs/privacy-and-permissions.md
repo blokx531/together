@@ -15,7 +15,8 @@ assert what each can read and change.
 
 Each new feature adds rows to this table when it ships.
 
-Personal expenses default to **private**; sharing one is an explicit checkbox.
+Personal expenses default to **private**; sharing one is an explicit checkbox. Meals default to the visibility chosen in
+Settings (initially shared) and can be made private per meal. Weight data is private until shared.
 
 ## Consent and defaults
 

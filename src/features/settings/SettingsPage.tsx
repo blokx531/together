@@ -188,6 +188,35 @@ function PasswordCard() {
   );
 }
 
+function DataSourcesCard() {
+  return (
+    <Card title="About the food data">
+      <ul className="flex list-disc flex-col gap-2 pl-5 text-sm text-ink-muted">
+        <li>
+          Indian dishes: Katori Indian food nutrition dataset,{' '}
+          <a
+            href="https://getkatori.com/data"
+            className="text-accent underline"
+            rel="noreferrer"
+            target="_blank"
+          >
+            getkatori.com/data
+          </a>{' '}
+          (CC BY 4.0).
+        </li>
+        <li>
+          Other foods: McCance and Widdowson&apos;s Composition of Foods Integrated Dataset 2021.
+          Contains public sector information licensed under the Open Government Licence v3.0.
+        </li>
+        <li>
+          Values are typical averages. Home cooking, oil and portions vary, so calorie numbers are
+          estimates.
+        </li>
+      </ul>
+    </Card>
+  );
+}
+
 export function SettingsPage() {
   const household = useHousehold();
   const signOutAction = useAsyncAction(signOut);
@@ -200,6 +229,7 @@ export function SettingsPage() {
         <HouseholdCard />
         {household.partner ? null : <InvitePartnerCard />}
         <PasswordCard />
+        <DataSourcesCard />
         <FormError message={signOutAction.error?.message} />
         <Button
           variant="secondary"

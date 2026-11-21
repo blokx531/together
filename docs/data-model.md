@@ -85,3 +85,36 @@ client loaded (`STALE_EXPENSE` otherwise). `voided_by` is always set to the call
 - **Concurrency:** text/note/details edits are sent with `.eq('revision', loaded)`; zero updated rows means a
   conflict (`STALE_ITEM`) and the UI refetches instead of overwriting. Ticking is an absolute intent and applies
   regardless of revision. Duplicate inserts are dropped via `client_request_id` (`upsert … ignoreDuplicates`).
+
+## Nutrition (migrations `…0400_nutrition.sql`, `…0500_food_catalog.sql`)
+
+| Table            | Key columns                                                                                                                                                                                                                          | Constraints                                                                             | Readable by                                       | Writable by                                 |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------- |
+| `food_sources`   | `id`, `license`, `attribution`                                                                                                                                                                                                       | reference data                                                                          | everyone signed in                                | migrations only                             |
+| `foods`          | `source_id`, `source_ref`, `owner_user_id` (null = catalog), `household_id` (custom food shared), `basis_unit` (g/ml/serving), `basis_amount` (100 or 1), `kcal_per_basis`, macros, `provenance`, `aliases`, generated `search_text` | kcal ≤ 900/100 g, ≤ 5000/serving; catalog ⇔ no owner; unique (`source_id`,`source_ref`) | catalog: all; custom: owner, or members if shared | owner only (custom); catalog via migrations |
+| `food_servings`  | `food_id`, `label`, `amount` (in basis units)                                                                                                                                                                                        | amount > 0                                                                              | follows the food                                  | food owner                                  |
+| `meals`          | `owner_user_id`, `household_id`, `local_date`, `meal_type`, `custom_label`, `visibility`                                                                                                                                             | one per (owner, date, type, label)                                                      | owner; partner if `household`                     | owner                                       |
+| `meal_items`     | snapshot of the food (`food_name`, `basis_*`, `kcal_per_basis`, macros, `source_label`, `provenance`), `quantity`, `serving_label/count`, **generated** `kcal`/macros, `client_request_id`                                           | quantity > 0; meal deleted when its last item goes                                      | follows the meal                                  | meal owner (portion only)                   |
+| `nutrition_days` | (`owner_user_id`, `local_date`), `is_complete`                                                                                                                                                                                       | —                                                                                       | self and partner                                  | self                                        |
+
+- **Snapshots:** `log_food` copies the food's values server-side from a row the caller can read, so history never
+  changes when a food is edited and a client cannot claim catalog provenance for invented numbers.
+- **Calculation:** `kcal = round(quantity / basis_amount × kcal_per_basis, 2)` (generated column); the client preview
+  uses the same formula (`domain/calories.ts`). Day totals are sums of items; macro totals are hidden unless every
+  item has them.
+- **RPCs:** `log_food` (idempotent), `copy_meal` (idempotent via uuid v5 of request id + item id), `move_meal` (merges),
+  `set_day_complete`, `my_daily_intake(from, to)` (days with no food are absent, never zero).
+
+## Weight & goals (migration `…0600_weight_goals.sql`)
+
+| Table                    | Key columns                                                                                                                                                                 | Readable by                       | Writable by                                       |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------- |
+| `energy_profiles`        | `formula_sex`, `birth_date`, `height_cm`, `activity_level`, `maintenance_mode` (formula/manual), `maintenance_kcal_manual`, `daily_intake_target_kcal`, `weight_visibility` | **self only**                     | self                                              |
+| `weight_goals`           | `goal_type`, `start_weight_kg`, `start_date`, `target_weight_kg`, `target_date`, `effective_from` (versioned; newest wins)                                                  | self; partner if weight is shared | self (insert only — history is never overwritten) |
+| `weight_entries`         | `local_date` (unique per user), `weight_kg` 20–350                                                                                                                          | self; partner if shared           | self (`record_weight` corrects same-day entries)  |
+| `weight_entry_revisions` | previous value of every correction/deletion (trigger)                                                                                                                       | self                              | trigger only                                      |
+
+`partner_weight_shared()` tells a partner only whether sharing is on. Energy maths lives in
+`src/features/weight-goals/domain/` (Mifflin-St Jeor × activity factor; deficit = maintenance − eaten; remaining to
+target = target − eaten; intake projection at ~7,700 kcal/kg using complete days only; observed trend needs ≥ 3
+weigh-ins over ≥ 14 days).

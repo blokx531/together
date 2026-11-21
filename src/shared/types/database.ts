@@ -3,6 +3,54 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      energy_profiles: {
+        Row: {
+          activity_level: string | null;
+          birth_date: string | null;
+          daily_intake_target_kcal: number | null;
+          formula_sex: string | null;
+          height_cm: number | null;
+          maintenance_kcal_manual: number | null;
+          maintenance_mode: string;
+          updated_at: string;
+          user_id: string;
+          weight_visibility: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          activity_level?: string | null;
+          birth_date?: string | null;
+          daily_intake_target_kcal?: number | null;
+          formula_sex?: string | null;
+          height_cm?: number | null;
+          maintenance_kcal_manual?: number | null;
+          maintenance_mode?: string;
+          updated_at?: string;
+          user_id: string;
+          weight_visibility?: string;
+        };
+        Update: {
+          activity_level?: string | null;
+          birth_date?: string | null;
+          daily_intake_target_kcal?: number | null;
+          formula_sex?: string | null;
+          height_cm?: number | null;
+          maintenance_kcal_manual?: number | null;
+          maintenance_mode?: string;
+          updated_at?: string;
+          user_id?: string;
+          weight_visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'energy_profiles_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       expense_revisions: {
         Row: {
           change: string;
@@ -176,6 +224,153 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['user_id'];
+          },
+        ];
+      };
+      food_servings: {
+        Row: {
+          amount: number;
+          food_id: string;
+          id: string;
+          label: string;
+          position: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount: number;
+          food_id: string;
+          id?: string;
+          label: string;
+          position?: number;
+        };
+        Update: {
+          amount?: number;
+          food_id?: string;
+          id?: string;
+          label?: string;
+          position?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'food_servings_food_id_fkey';
+            columns: ['food_id'];
+            isOneToOne: false;
+            referencedRelation: 'foods';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      food_sources: {
+        Row: {
+          attribution: string;
+          id: string;
+          license: string;
+          name: string;
+          url: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attribution: string;
+          id: string;
+          license: string;
+          name: string;
+          url: string;
+        };
+        Update: {
+          attribution?: string;
+          id?: string;
+          license?: string;
+          name?: string;
+          url?: string;
+        };
+        Relationships: [];
+      };
+      foods: {
+        Row: {
+          aliases: string[];
+          archived_at: string | null;
+          basis_amount: number;
+          basis_unit: string;
+          carbs_g_per_basis: number | null;
+          created_at: string;
+          fat_g_per_basis: number | null;
+          household_id: string | null;
+          id: string;
+          kcal_per_basis: number;
+          name: string;
+          owner_user_id: string | null;
+          protein_g_per_basis: number | null;
+          provenance: string;
+          search_text: string | null;
+          source_id: string;
+          source_ref: string | null;
+          updated_at: string;
+          variant: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          aliases?: string[];
+          archived_at?: string | null;
+          basis_amount: number;
+          basis_unit: string;
+          carbs_g_per_basis?: number | null;
+          created_at?: string;
+          fat_g_per_basis?: number | null;
+          household_id?: string | null;
+          id?: string;
+          kcal_per_basis: number;
+          name: string;
+          owner_user_id?: string | null;
+          protein_g_per_basis?: number | null;
+          provenance: string;
+          search_text?: never;
+          source_id: string;
+          source_ref?: string | null;
+          updated_at?: string;
+          variant?: string | null;
+        };
+        Update: {
+          aliases?: string[];
+          archived_at?: string | null;
+          basis_amount?: number;
+          basis_unit?: string;
+          carbs_g_per_basis?: number | null;
+          created_at?: string;
+          fat_g_per_basis?: number | null;
+          household_id?: string | null;
+          id?: string;
+          kcal_per_basis?: number;
+          name?: string;
+          owner_user_id?: string | null;
+          protein_g_per_basis?: number | null;
+          provenance?: string;
+          search_text?: never;
+          source_id?: string;
+          source_ref?: string | null;
+          updated_at?: string;
+          variant?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'foods_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'foods_owner_user_id_fkey';
+            columns: ['owner_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'foods_source_id_fkey';
+            columns: ['source_id'];
+            isOneToOne: false;
+            referencedRelation: 'food_sources';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -443,6 +638,185 @@ export type Database = {
           },
         ];
       };
+      meal_items: {
+        Row: {
+          basis_amount: number;
+          basis_unit: string;
+          carbs_g: number | null;
+          carbs_g_per_basis: number | null;
+          client_request_id: string;
+          created_at: string;
+          fat_g: number | null;
+          fat_g_per_basis: number | null;
+          food_id: string | null;
+          food_name: string;
+          food_variant: string | null;
+          id: string;
+          kcal: number | null;
+          kcal_per_basis: number;
+          meal_id: string;
+          protein_g: number | null;
+          protein_g_per_basis: number | null;
+          provenance: string;
+          quantity: number;
+          serving_count: number | null;
+          serving_label: string | null;
+          source_label: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          basis_amount: number;
+          basis_unit: string;
+          carbs_g?: never;
+          carbs_g_per_basis?: number | null;
+          client_request_id: string;
+          created_at?: string;
+          fat_g?: never;
+          fat_g_per_basis?: number | null;
+          food_id?: string | null;
+          food_name: string;
+          food_variant?: string | null;
+          id?: string;
+          kcal?: never;
+          kcal_per_basis: number;
+          meal_id: string;
+          protein_g?: never;
+          protein_g_per_basis?: number | null;
+          provenance: string;
+          quantity: number;
+          serving_count?: number | null;
+          serving_label?: string | null;
+          source_label: string;
+          updated_at?: string;
+        };
+        Update: {
+          basis_amount?: number;
+          basis_unit?: string;
+          carbs_g?: never;
+          carbs_g_per_basis?: number | null;
+          client_request_id?: string;
+          created_at?: string;
+          fat_g?: never;
+          fat_g_per_basis?: number | null;
+          food_id?: string | null;
+          food_name?: string;
+          food_variant?: string | null;
+          id?: string;
+          kcal?: never;
+          kcal_per_basis?: number;
+          meal_id?: string;
+          protein_g?: never;
+          protein_g_per_basis?: number | null;
+          provenance?: string;
+          quantity?: number;
+          serving_count?: number | null;
+          serving_label?: string | null;
+          source_label?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'meal_items_food_id_fkey';
+            columns: ['food_id'];
+            isOneToOne: false;
+            referencedRelation: 'foods';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'meal_items_meal_id_fkey';
+            columns: ['meal_id'];
+            isOneToOne: false;
+            referencedRelation: 'meals';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      meals: {
+        Row: {
+          created_at: string;
+          custom_label: string;
+          household_id: string;
+          id: string;
+          local_date: string;
+          meal_type: string;
+          note: string | null;
+          owner_user_id: string;
+          updated_at: string;
+          visibility: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          custom_label?: string;
+          household_id: string;
+          id?: string;
+          local_date: string;
+          meal_type: string;
+          note?: string | null;
+          owner_user_id: string;
+          updated_at?: string;
+          visibility: string;
+        };
+        Update: {
+          created_at?: string;
+          custom_label?: string;
+          household_id?: string;
+          id?: string;
+          local_date?: string;
+          meal_type?: string;
+          note?: string | null;
+          owner_user_id?: string;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'meals_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'meals_owner_user_id_fkey';
+            columns: ['owner_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
+      nutrition_days: {
+        Row: {
+          is_complete: boolean;
+          local_date: string;
+          owner_user_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          is_complete?: boolean;
+          local_date: string;
+          owner_user_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          is_complete?: boolean;
+          local_date?: string;
+          owner_user_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'nutrition_days_owner_user_id_fkey';
+            columns: ['owner_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       profiles: {
         Row: {
           created_at: string;
@@ -559,12 +933,145 @@ export type Database = {
           },
         ];
       };
+      weight_entries: {
+        Row: {
+          client_request_id: string;
+          created_at: string;
+          id: string;
+          local_date: string;
+          note: string | null;
+          updated_at: string;
+          user_id: string;
+          weight_kg: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          client_request_id: string;
+          created_at?: string;
+          id?: string;
+          local_date: string;
+          note?: string | null;
+          updated_at?: string;
+          user_id: string;
+          weight_kg: number;
+        };
+        Update: {
+          client_request_id?: string;
+          created_at?: string;
+          id?: string;
+          local_date?: string;
+          note?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          weight_kg?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'weight_entries_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
+      weight_entry_revisions: {
+        Row: {
+          change: string;
+          created_at: string;
+          id: string;
+          previous: NonNullable<Json>;
+          user_id: string;
+          weight_entry_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          change: string;
+          created_at?: string;
+          id?: string;
+          previous: NonNullable<Json>;
+          user_id: string;
+          weight_entry_id: string;
+        };
+        Update: {
+          change?: string;
+          created_at?: string;
+          id?: string;
+          previous?: NonNullable<Json>;
+          user_id?: string;
+          weight_entry_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'weight_entry_revisions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
+      weight_goals: {
+        Row: {
+          created_at: string;
+          effective_from: string;
+          goal_type: string;
+          id: string;
+          start_date: string;
+          start_weight_kg: number;
+          target_date: string | null;
+          target_weight_kg: number | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          effective_from: string;
+          goal_type: string;
+          id?: string;
+          start_date: string;
+          start_weight_kg: number;
+          target_date?: string | null;
+          target_weight_kg?: number | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          effective_from?: string;
+          goal_type?: string;
+          id?: string;
+          start_date?: string;
+          start_weight_kg?: number;
+          target_date?: string | null;
+          target_weight_kg?: number | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'weight_goals_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
       accept_household_invitation: { Args: { invitation_token: string }; Returns: string };
+      copy_meal: {
+        Args: {
+          p_request_id: string;
+          p_source_meal_id: string;
+          p_target_custom_label: string;
+          p_target_date: string;
+          p_target_meal_type: string;
+        };
+        Returns: string;
+      };
       create_household: { Args: { household_name: string }; Returns: string };
       create_household_invitation: {
         Args: Record<PropertyKey, never>;
@@ -585,6 +1092,38 @@ export type Database = {
           user_id: string;
         }[];
       };
+      log_food: {
+        Args: {
+          p_client_request_id: string;
+          p_custom_label: string;
+          p_food_id: string;
+          p_local_date: string;
+          p_meal_type: string;
+          p_quantity: number;
+          p_serving_count: number;
+          p_serving_label: string;
+          p_visibility: string;
+        };
+        Returns: string;
+      };
+      move_meal: {
+        Args: {
+          p_meal_id: string;
+          p_target_custom_label: string;
+          p_target_date: string;
+          p_target_meal_type: string;
+        };
+        Returns: string;
+      };
+      my_daily_intake: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          is_complete: boolean;
+          kcal: number;
+          local_date: string;
+        }[];
+      };
+      partner_weight_shared: { Args: Record<PropertyKey, never>; Returns: boolean };
       preview_household_invitation: {
         Args: { invitation_token: string };
         Returns: {
@@ -601,6 +1140,15 @@ export type Database = {
           p_note: string;
           p_settled_on: string;
           p_to_user_id: string;
+        };
+        Returns: string;
+      };
+      record_weight: {
+        Args: {
+          p_client_request_id: string;
+          p_local_date: string;
+          p_note: string;
+          p_weight_kg: number;
         };
         Returns: string;
       };
@@ -622,6 +1170,10 @@ export type Database = {
           p_visibility: string;
         };
         Returns: string;
+      };
+      set_day_complete: {
+        Args: { p_is_complete: boolean; p_local_date: string };
+        Returns: undefined;
       };
       set_expense_voided: {
         Args: { p_expected_version: number; p_expense_id: string; p_voided: boolean };

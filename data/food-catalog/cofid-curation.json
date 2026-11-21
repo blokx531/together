@@ -1,0 +1,254 @@
+{
+  "_comment": "Curated subset of UK CoFID 2021 (Open Government Licence v3.0). Values are per 100 g as eaten. Serving sizes follow the Katori dataset conventions (1 katori = 150 g curry/dal/sabzi, 120 g rice; roti 40 g; plain paratha 60 g), ICMR-NIN measures (1 cup = 200 ml, tablespoon 15 g, teaspoon 5 g) or are marked 'typical' when they are common household estimates that users should adjust.",
+  "foods": [
+    {
+      "code": "15-146",
+      "name": "Rajma (kidney bean curry)",
+      "aliases": ["rajma", "kidney beans", "red beans"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-108",
+      "name": "Chole (chickpea curry, Punjabi)",
+      "aliases": ["chole", "chana", "chickpea", "kabuli chana"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-641",
+      "name": "Chana dal curry",
+      "aliases": ["chana dal", "bengal gram"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-762",
+      "name": "Masoor dal (Punjabi)",
+      "aliases": ["masoor", "red lentil", "dal", "daal"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-780",
+      "name": "Toor dal curry (with oil)",
+      "aliases": ["arhar dal", "tuvar", "pigeon pea", "dal", "daal"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "13-105",
+      "name": "Toor dal, plain boiled (no fat)",
+      "aliases": ["arhar dal", "plain dal", "dal", "daal"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "13-099",
+      "name": "Moong dal, plain boiled (no fat)",
+      "aliases": ["moong", "mung", "green gram", "dal", "daal"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-768",
+      "name": "Moong dal curry (Bengali)",
+      "aliases": ["moong", "mung", "dal", "daal"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-679",
+      "name": "Aloo gobi",
+      "aliases": ["aloo gobhi", "potato cauliflower", "sabzi", "subzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-627",
+      "name": "Bhindi sabzi",
+      "aliases": ["bhindi", "okra", "lady finger", "sabzi", "subzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-628",
+      "name": "Methi aloo",
+      "aliases": ["aloo methi", "fenugreek potato", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-783",
+      "name": "Aloo curry (Punjabi)",
+      "aliases": ["aloo sabzi", "potato curry", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-781",
+      "name": "Aloo matar",
+      "aliases": ["potato peas", "matar aloo", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-694",
+      "name": "Palak sabzi (spinach bhaji)",
+      "aliases": ["palak", "spinach", "saag", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-675",
+      "name": "Patta gobi aloo (cabbage potato)",
+      "aliases": ["cabbage", "band gobhi", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-024",
+      "name": "Beans sabzi (green beans)",
+      "aliases": ["green beans", "french beans", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-669",
+      "name": "Baingan aloo",
+      "aliases": ["brinjal", "aubergine", "eggplant", "sabzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-048",
+      "name": "Mixed veg sabzi (Punjabi)",
+      "aliases": ["mix veg", "mixed vegetables", "sabzi", "subzi"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "15-528",
+      "name": "Khichdi (with ghee)",
+      "aliases": ["khichadi", "khichri"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "11-459",
+      "name": "Phulka / chapati, no fat",
+      "aliases": ["roti", "chapati", "phulka", "chapathi"],
+      "servings": [["1 medium (40 g)", 40]]
+    },
+    {
+      "code": "11-1104",
+      "name": "Paratha, homemade (UK survey recipe)",
+      "aliases": ["parantha", "paratha"],
+      "servings": [["1 plain paratha (60 g)", 60]]
+    },
+    { "code": "11-911", "name": "Puri, homemade", "aliases": ["poori"], "servings": [] },
+    {
+      "code": "11-858",
+      "name": "Basmati rice, boiled",
+      "aliases": ["rice", "chawal", "basmati"],
+      "servings": [["1 katori (120 g)", 120]]
+    },
+    { "code": "12-495", "name": "Paneer", "aliases": ["cottage cheese", "panir"], "servings": [] },
+    {
+      "code": "12-184",
+      "name": "Curd / dahi (whole milk, plain)",
+      "aliases": ["curd", "dahi", "yogurt", "yoghurt"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "17-832",
+      "name": "Raita",
+      "aliases": ["raita", "curd"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "12-596",
+      "name": "Milk, whole",
+      "aliases": ["doodh", "full cream milk"],
+      "basis": "ml",
+      "servings": [["1 cup (200 ml)", 200]]
+    },
+    {
+      "code": "12-313",
+      "name": "Milk, semi-skimmed (about 1.7% fat)",
+      "aliases": ["doodh", "toned milk", "low fat milk"],
+      "basis": "ml",
+      "servings": [["1 cup (200 ml)", 200]]
+    },
+    {
+      "code": "12-940",
+      "name": "Egg, boiled",
+      "aliases": ["anda", "boiled egg", "egg"],
+      "servings": [["1 egg (~50 g, typical)", 50]]
+    },
+    {
+      "code": "12-946",
+      "name": "Omelette, plain",
+      "aliases": ["anda", "omelet", "egg"],
+      "servings": []
+    },
+    {
+      "code": "12-944",
+      "name": "Egg, fried (sunflower oil)",
+      "aliases": ["anda", "fried egg", "egg"],
+      "servings": [["1 egg (~50 g, typical)", 50]]
+    },
+    {
+      "code": "17-640",
+      "name": "Ghee",
+      "aliases": ["clarified butter", "desi ghee"],
+      "servings": [
+        ["1 tsp (5 g)", 5],
+        ["1 tbsp (15 g)", 15]
+      ]
+    },
+    {
+      "code": "17-045",
+      "name": "Cooking oil (sunflower)",
+      "aliases": ["oil", "tel", "refined oil"],
+      "servings": [
+        ["1 tsp (5 g)", 5],
+        ["1 tbsp (15 g)", 15]
+      ]
+    },
+    {
+      "code": "17-685",
+      "name": "Butter, salted",
+      "aliases": ["makhan", "butter"],
+      "servings": [["1 tsp (5 g)", 5]]
+    },
+    {
+      "code": "17-063",
+      "name": "Sugar",
+      "aliases": ["chini", "cheeni", "sugar"],
+      "servings": [["1 tsp (5 g)", 5]]
+    },
+    { "code": "17-050", "name": "Honey", "aliases": ["shahad"], "servings": [["1 tsp (5 g)", 5]] },
+    {
+      "code": "14-318",
+      "name": "Banana",
+      "aliases": ["kela"],
+      "servings": [["1 medium, peeled (~100 g, typical)", 100]]
+    },
+    { "code": "14-319", "name": "Apple", "aliases": ["seb"], "servings": [] },
+    { "code": "14-327", "name": "Orange", "aliases": ["santra", "narangi"], "servings": [] },
+    { "code": "14-378", "name": "Mango, ripe", "aliases": ["aam"], "servings": [] },
+    { "code": "14-118", "name": "Guava", "aliases": ["amrood"], "servings": [] },
+    { "code": "14-350", "name": "Grapes", "aliases": ["angoor"], "servings": [] },
+    { "code": "14-394", "name": "Dates, dried", "aliases": ["khajur"], "servings": [] },
+    { "code": "13-523", "name": "Cucumber", "aliases": ["kheera", "salad"], "servings": [] },
+    {
+      "code": "14-877",
+      "name": "Peanuts, plain",
+      "aliases": ["moongphali", "groundnut"],
+      "servings": []
+    },
+    { "code": "14-896", "name": "Almonds", "aliases": ["badam"], "servings": [] },
+    { "code": "14-811", "name": "Cashew nuts", "aliases": ["kaju"], "servings": [] },
+    {
+      "code": "15-828",
+      "name": "Onion pakora / bhajia",
+      "aliases": ["pakoda", "bhaji", "onion bhaji"],
+      "servings": []
+    },
+    {
+      "code": "11-1108",
+      "name": "Oats porridge (whole milk)",
+      "aliases": ["oats", "daliya", "porridge"],
+      "servings": [["1 katori (150 g)", 150]]
+    },
+    {
+      "code": "11-981",
+      "name": "Bread, wholemeal (brown)",
+      "aliases": ["brown bread", "atta bread"],
+      "servings": []
+    },
+    { "code": "11-980", "name": "Bread, white", "aliases": ["white bread", "pav"], "servings": [] }
+  ]
+}

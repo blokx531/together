@@ -10,6 +10,12 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { lazyPage } from './lazyPage';
 
 const HomePage = lazyPage(() => import('@/features/dashboard/HomePage').then((m) => m.HomePage));
+const FoodPage = lazyPage(() =>
+  import('@/features/nutrition/pages/FoodPage').then((m) => m.FoodPage),
+);
+const ProgressPage = lazyPage(() =>
+  import('@/features/weight-goals/pages/ProgressPage').then((m) => m.ProgressPage),
+);
 const MoneyPage = lazyPage(() =>
   import('@/features/expenses/pages/MoneyPage').then((m) => m.MoneyPage),
 );
@@ -30,6 +36,8 @@ function SignedInRoutes({ userId }: { userId: string }) {
         <Suspense fallback={<LoadingRows label="Loading page" />}>
           <Switch>
             <Route path="/" component={HomePage} />
+            <Route path="/food" component={FoodPage} />
+            <Route path="/food/progress" component={ProgressPage} />
             <Route path="/money" component={MoneyPage} />
             <Route path="/lists" component={ListsPage} />
             <Route path="/lists/:id" component={ListDetailPage} />
