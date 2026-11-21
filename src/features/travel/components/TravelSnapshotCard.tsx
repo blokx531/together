@@ -36,7 +36,8 @@ export function TravelSnapshotCard() {
             return (
               <div className="flex flex-col gap-2 text-sm">
                 <p>
-                  <strong className="text-lg tabular-nums">{stats.placesVisited}</strong> places in{' '}
+                  <strong className="text-lg tabular-nums">{stats.placesVisited}</strong>{' '}
+                  {stats.placesVisited === 1 ? 'place' : 'places'} in{' '}
                   <strong className="tabular-nums">{stats.countriesVisited}</strong>{' '}
                   {stats.countriesVisited === 1 ? 'country' : 'countries'}
                   {together !== null ? ` · ${together} together` : ''}

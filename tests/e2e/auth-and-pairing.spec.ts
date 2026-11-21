@@ -68,3 +68,35 @@ test('a used invite link cannot be reused by a third person', async ({ browser }
   await expect(c.getByText('This invite link is no longer valid.', { exact: false })).toBeVisible();
   await expect(c.getByRole('button', { name: /Join/ })).toHaveCount(0);
 });
+
+test('exports personal data as JSON', async ({ browser }) => {
+  const { a } = await pairTwoPeople(browser);
+  await a.goto('/settings');
+  const downloadPromise = a.waitForEvent('download');
+  await a.getByRole('button', { name: 'Export my data' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^together-export-\d{4}-\d{2}-\d{2}\.json$/);
+  const path = await download.path();
+  const { readFileSync } = await import('node:fs');
+  const exported = JSON.parse(readFileSync(path, 'utf8')) as {
+    format: string;
+    tables: Record<string, unknown[]>;
+  };
+  expect(exported.format).toBe('together-export');
+  expect(exported.tables.profiles).toHaveLength(2);
+  expect(exported.tables.household_members).toHaveLength(2);
+  expect(exported.tables.foods).toEqual([]);
+});
+
+test('a lost or expired session sends you back to sign in', async ({ browser }) => {
+  const { a } = await pairTwoPeople(browser);
+  await a.goto('/money');
+  await expect(a.getByRole('heading', { name: 'Money' })).toBeVisible();
+  // Simulate the stored session disappearing (expired refresh token, cleared storage).
+  await a.evaluate(() => {
+    for (const key of Object.keys(localStorage))
+      if (key.includes('auth-token')) localStorage.removeItem(key);
+  });
+  await a.reload();
+  await expect(a).toHaveURL(/\/sign-in$/);
+});

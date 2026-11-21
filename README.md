@@ -11,6 +11,21 @@ weight goals, personal and shared money with exact splits, shared lists, and a t
 
 `AGENTS.md` is the binding engineering contract for anyone (human or AI) changing this code.
 
+## What it does
+
+- **Home:** today's calories, this month's spending and balance, busiest lists, travel summary.
+- **Food:** search 179 licensed foods (Indian dishes from the Katori dataset, staples from UK CoFID) with Indian
+  spellings (roti/chapati, dal/daal…), household servings (katori, plate, piece), custom foods from labels or
+  estimates, per-meal privacy, partner's shared diary, "same as yesterday", day-complete flag, energy balance
+  against an estimated or manual maintenance value. **Weight & goals:** versioned goals, weekly weigh-ins (audited),
+  measured vs. estimated chart, optional sharing.
+- **Money:** personal and shared expenses in integer paise, equal/custom/percentage splits with exact rounding,
+  net balance computed in Postgres, settlements that never count as spending, filters, CSV export.
+- **Lists:** to-do, groceries (quick add "Atta 5 kg"), watchlist, ideas, packing, custom; private or shared;
+  reorder; edits never silently overwrite your partner's.
+- **World:** stamp visited places (who went, when), wishlist, Mine/Partner/Together filters, map (lazy-loaded).
+- **Settings:** profile, time zone, invite link, password, JSON export of your data.
+
 ## Prerequisites
 
 - Node.js 22+ and npm

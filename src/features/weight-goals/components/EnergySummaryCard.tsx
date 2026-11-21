@@ -60,11 +60,15 @@ export function EnergySummaryCard({ date, eatenKcal, isDayComplete }: EnergySumm
                 <>
                   <dl>{eatenTile}</dl>
                   <p className="mt-2 text-sm text-ink-muted">
-                    To estimate your deficit or surplus, add {maintenance.missing.join(', ')} on the{' '}
+                    {maintenance.missing.includes('energy profile') ||
+                    maintenance.missing.includes('maintenance calories')
+                      ? 'Set your maintenance calories'
+                      : `Add ${maintenance.missing.join(', ')}`}{' '}
+                    on the{' '}
                     <Link href="/food/progress" className="font-medium text-accent">
                       goals page
-                    </Link>
-                    .
+                    </Link>{' '}
+                    to see an estimated deficit or surplus.
                   </p>
                 </>
               );

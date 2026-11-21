@@ -1,18 +1,18 @@
-import { useDeferredValue, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { useHousehold } from '@/features/household';
 import { parseLocalDate, type LocalDate } from '@/shared/lib/localDate';
 import { newRequestId } from '@/shared/lib/requestId';
 import { useAsyncAction } from '@/shared/lib/useAsyncAction';
 import { useResource } from '@/shared/lib/useResource';
 import { Button } from '@/shared/ui/Button';
-import { FormError, TextField } from '@/shared/ui/Field';
+import { FormError, SelectField, TextField } from '@/shared/ui/Field';
 import { SegmentedControl } from '@/shared/ui/SegmentedControl';
 import { Sheet } from '@/shared/ui/Sheet';
 import { ErrorState, LoadingRows } from '@/shared/ui/States';
 import { useToast } from '@/shared/ui/Toast';
 import { MIN_SEARCH_LENGTH, searchPlaces, type PlaceSuggestion } from '../data/placeSearch';
 import { createPlace } from '../data/travelApi';
-import { flagEmoji, parseCoordinates } from '../domain/places';
+import { countryOptions, flagEmoji, parseCoordinates } from '../domain/places';
 import { VisitorPicker } from './VisitorPicker';
 
 interface AddPlaceSheetProps {
@@ -91,7 +91,8 @@ function AddPlaceForm({ today, onClose, onSaved }: Omit<AddPlaceSheetProps, 'ope
   const deferredQuery = useDeferredValue(query.trim());
   const [picked, setPicked] = useState<PlaceSuggestion | null>(null);
   const [manualName, setManualName] = useState('');
-  const [manualCountry, setManualCountry] = useState('');
+  const [manualCountry, setManualCountry] = useState('IN');
+  const countries = useMemo(() => countryOptions(), []);
   const [manualCoordinates, setManualCoordinates] = useState('');
   const [status, setStatus] = useState<'visited' | 'wishlist'>('visited');
   const [visibility, setVisibility] = useState<'household' | 'private'>(
@@ -124,8 +125,8 @@ function AddPlaceForm({ today, onClose, onSaved }: Omit<AddPlaceSheetProps, 'ope
         name: manualName.trim(),
         locality: null,
         region: null,
-        countryCode: null,
-        countryName: manualCountry.trim() || null,
+        countryCode: manualCountry === '' ? null : manualCountry,
+        countryName: countries.find((country) => country.code === manualCountry)?.name ?? null,
         ...coordinates,
         sourceRef: null,
         source: 'manual',
@@ -222,14 +223,20 @@ function AddPlaceForm({ today, onClose, onSaved }: Omit<AddPlaceSheetProps, 'ope
               setManualName(event.target.value);
             }}
           />
-          <TextField
-            label="Country (optional)"
-            maxLength={80}
+          <SelectField
+            label="Country"
             value={manualCountry}
             onChange={(event) => {
               setManualCountry(event.target.value);
             }}
-          />
+          >
+            <option value="">Not sure / at sea</option>
+            {countries.map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.name}
+              </option>
+            ))}
+          </SelectField>
           <TextField
             label="Coordinates"
             placeholder="26.9124, 75.7873"

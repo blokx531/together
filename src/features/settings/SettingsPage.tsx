@@ -1,4 +1,4 @@
-import { LogOut } from 'lucide-react';
+import { Download, LogOut } from 'lucide-react';
 import { useState, type SubmitEvent } from 'react';
 import { describeAuthError, signOut, updatePassword } from '@/features/auth';
 import {
@@ -15,6 +15,7 @@ import { Card } from '@/shared/ui/Card';
 import { FormError, SelectField, TextField } from '@/shared/ui/Field';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { useToast } from '@/shared/ui/Toast';
+import { exportMyData } from './data/exportData';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -188,6 +189,41 @@ function PasswordCard() {
   );
 }
 
+function ExportCard() {
+  const toast = useToast();
+  const exportAction = useAsyncAction(exportMyData);
+  const onExport = async () => {
+    const result = await exportAction.run();
+    if (!result?.ok) return;
+    const json = JSON.stringify(result.value, null, 2);
+    const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `together-export-${result.value.exportedAt.slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.show('Export downloaded', { tone: 'success' });
+  };
+  return (
+    <Card title="Your data">
+      <p className="mb-3 text-sm text-ink-muted">
+        Download everything you can see (your records and what your partner shares) as a JSON file.
+        The free database plan has no backups, so keep an occasional copy somewhere private. Money
+        has a CSV export on the Money page.
+      </p>
+      <FormError message={exportAction.error?.message} />
+      <Button
+        variant="secondary"
+        icon={<Download className="size-4" aria-hidden />}
+        isLoading={exportAction.isPending}
+        onClick={() => void onExport()}
+      >
+        Export my data
+      </Button>
+    </Card>
+  );
+}
+
 function DataSourcesCard() {
   return (
     <Card title="About the food data">
@@ -229,6 +265,7 @@ export function SettingsPage() {
         <HouseholdCard />
         {household.partner ? null : <InvitePartnerCard />}
         <PasswordCard />
+        <ExportCard />
         <DataSourcesCard />
         <FormError message={signOutAction.error?.message} />
         <Button

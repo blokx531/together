@@ -17,10 +17,11 @@ provider emails about plan changes.
 ## Controls
 
 - No service with a payment method is required or configured. No paid API is called from the client.
+- Optional AI is not built, so no AI provider is called. When built, it must hard-stop at the free allocation.
 - The app stores no photos yet. If photo features are added, they must be compressed client-side and capped
   (see `AGENTS.md` §6).
 - **Pausing:** daily use by two people is normally enough activity. If the owner gets Supabase's pause warning
   email, opening the app (or the dashboard) once resumes activity; a paused project is restored via
   _Dashboard → Resume project_.
-- **Backups:** the Free plan has none. Use the in-app export (planned in Settings) or
+- **Backups:** the Free plan has none. Use Settings → "Export my data" (JSON) and Money → CSV export, or
   `npx supabase db dump --linked -f backup.sql` from a laptop, and store dumps privately (they contain personal data).

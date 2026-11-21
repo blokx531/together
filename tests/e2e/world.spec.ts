@@ -9,7 +9,6 @@ async function addManualPlace(
   const sheet = page.getByRole('dialog', { name: 'Add a place' });
   await sheet.getByText('Enter manually').click();
   await sheet.getByLabel('Place name').fill(options.name);
-  await sheet.getByLabel('Country (optional)').fill('India');
   await sheet.getByLabel('Coordinates').fill(options.coordinates);
   if (options.wishlist) {
     await sheet.getByText('Want to go').click();

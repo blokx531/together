@@ -124,3 +124,27 @@ export function flagEmoji(countryCode: string | null): string {
     REGIONAL_INDICATOR_A + countryCode.charCodeAt(1) - 65,
   );
 }
+
+export interface CountryOption {
+  code: string;
+  name: string;
+}
+
+/**
+ * ISO 3166-1 alpha-2 regions known to the browser's Intl data, sorted by English name. Built by
+ * probing every two-letter code, so no country list has to be shipped or maintained.
+ */
+export function countryOptions(locale = 'en'): CountryOption[] {
+  const names = new Intl.DisplayNames([locale], { type: 'region', fallback: 'none' });
+  const options: CountryOption[] = [];
+  for (let first = 65; first <= 90; first += 1) {
+    for (let second = 65; second <= 90; second += 1) {
+      const code = String.fromCharCode(first, second);
+      const name = names.of(code);
+      // Exclude reserved/private-use codes the browser does not name, and macro-regions like "EU".
+      if (name && name !== code && !['EU', 'EZ', 'UN', 'QO', 'XA', 'XB', 'ZZ'].includes(code))
+        options.push({ code, name });
+    }
+  }
+  return options.sort((a, b) => a.name.localeCompare(b.name, locale));
+}

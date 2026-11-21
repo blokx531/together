@@ -108,3 +108,22 @@ test('invalid amounts are explained, not saved', async ({ browser }) => {
   await expect(sheet.getByText('Enter an amount like 250 or 99.50.')).toBeVisible();
   await expect(sheet).toBeVisible();
 });
+
+test('going offline mid-entry shows an error and keeps what you typed', async ({ browser }) => {
+  const { a } = await pairTwoPeople(browser);
+  await a.goto('/money');
+  await a.getByRole('button', { name: 'Add expense' }).click();
+  const sheet = a.getByRole('dialog', { name: 'Add expense' });
+  await sheet.getByLabel('Amount (₹)').fill('499');
+  await sheet.getByLabel('What was it?').fill('Electricity');
+  await a.context().setOffline(true);
+  await sheet.getByRole('button', { name: 'Add expense' }).click();
+  await expect(sheet.getByRole('alert')).toContainText('Could not reach the server');
+  await expect(sheet.getByLabel('Amount (₹)')).toHaveValue('499');
+  await a.context().setOffline(false);
+  // Retrying with the same form re-sends the same request id, so it is saved exactly once.
+  await sheet.getByRole('button', { name: 'Add expense' }).click();
+  await expect(sheet).toBeHidden();
+  await a.reload();
+  await expect(a.getByRole('button', { name: /Electricity/ })).toHaveCount(1);
+});

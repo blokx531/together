@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { LocalDate } from '@/shared/lib/localDate';
 import { parsePhotonResponse } from '../data/placeSearch';
 import {
+  countryOptions,
   filterPlaces,
   flagEmoji,
   markerKind,
@@ -145,5 +146,14 @@ describe('parsePhotonResponse', () => {
 
   it('rejects a response that is not GeoJSON', () => {
     expect(() => parsePhotonResponse({ error: 'rate limited' })).toThrow();
+  });
+});
+
+describe('countryOptions', () => {
+  it('lists named ISO regions including India, without macro-regions', () => {
+    const options = countryOptions();
+    expect(options).toContainEqual({ code: 'IN', name: 'India' });
+    expect(options.find((o) => o.code === 'EU')).toBeUndefined();
+    expect(options.length).toBeGreaterThan(200);
   });
 });
