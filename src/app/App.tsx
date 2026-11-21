@@ -13,6 +13,12 @@ const HomePage = lazyPage(() => import('@/features/dashboard/HomePage').then((m)
 const MoneyPage = lazyPage(() =>
   import('@/features/expenses/pages/MoneyPage').then((m) => m.MoneyPage),
 );
+const ListsPage = lazyPage(() =>
+  import('@/features/lists/pages/ListsPage').then((m) => m.ListsPage),
+);
+const ListDetailPage = lazyPage(() =>
+  import('@/features/lists/pages/ListDetailPage').then((m) => m.ListDetailPage),
+);
 const SettingsPage = lazyPage(() =>
   import('@/features/settings/SettingsPage').then((m) => m.SettingsPage),
 );
@@ -25,6 +31,8 @@ function SignedInRoutes({ userId }: { userId: string }) {
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/money" component={MoneyPage} />
+            <Route path="/lists" component={ListsPage} />
+            <Route path="/lists/:id" component={ListDetailPage} />
             <Route path="/settings" component={SettingsPage} />
             <Route>
               <NotFound />

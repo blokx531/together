@@ -1,5 +1,6 @@
 import { MoneySnapshotCard } from '@/features/expenses';
 import { InvitePartnerCard, useHousehold } from '@/features/household';
+import { ListsSnapshotCard } from '@/features/lists';
 import { formatLocalDate, todayIn } from '@/shared/lib/localDate';
 
 function greetingFor(hour: number): string {
@@ -31,6 +32,7 @@ export function HomePage() {
       <div className="flex flex-col gap-4">
         {household.partner ? null : <InvitePartnerCard />}
         <MoneySnapshotCard />
+        <ListsSnapshotCard />
       </div>
     </>
   );

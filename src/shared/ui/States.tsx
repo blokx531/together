@@ -38,7 +38,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
 
 interface ErrorStateProps {
   error: AppError;
-  onRetry?: () => void;
+  onRetry?: (() => void) | undefined;
   /** Feature-specific copy for this error, when the generic message is not helpful enough. */
   message?: string;
 }

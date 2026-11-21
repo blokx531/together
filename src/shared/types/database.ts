@@ -308,6 +308,141 @@ export type Database = {
           },
         ];
       };
+      list_items: {
+        Row: {
+          client_request_id: string;
+          created_at: string;
+          created_by: string | null;
+          details: NonNullable<Json>;
+          done_at: string | null;
+          done_by: string | null;
+          id: string;
+          is_done: boolean;
+          list_id: string;
+          note: string | null;
+          position: string;
+          revision: number;
+          text: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          client_request_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          details?: NonNullable<Json>;
+          done_at?: string | null;
+          done_by?: string | null;
+          id?: string;
+          is_done?: boolean;
+          list_id: string;
+          note?: string | null;
+          position: string;
+          revision?: number;
+          text: string;
+          updated_at?: string;
+        };
+        Update: {
+          client_request_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          details?: NonNullable<Json>;
+          done_at?: string | null;
+          done_by?: string | null;
+          id?: string;
+          is_done?: boolean;
+          list_id?: string;
+          note?: string | null;
+          position?: string;
+          revision?: number;
+          text?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'list_items_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'list_items_done_by_fkey';
+            columns: ['done_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'list_items_list_id_fkey';
+            columns: ['list_id'];
+            isOneToOne: false;
+            referencedRelation: 'lists';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      lists: {
+        Row: {
+          archived_at: string | null;
+          client_request_id: string;
+          created_at: string;
+          description: string | null;
+          emoji: string;
+          household_id: string;
+          id: string;
+          kind: string;
+          owner_user_id: string;
+          title: string;
+          updated_at: string;
+          visibility: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          archived_at?: string | null;
+          client_request_id: string;
+          created_at?: string;
+          description?: string | null;
+          emoji?: string;
+          household_id: string;
+          id?: string;
+          kind: string;
+          owner_user_id: string;
+          title: string;
+          updated_at?: string;
+          visibility: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          client_request_id?: string;
+          created_at?: string;
+          description?: string | null;
+          emoji?: string;
+          household_id?: string;
+          id?: string;
+          kind?: string;
+          owner_user_id?: string;
+          title?: string;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'lists_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'lists_owner_user_id_fkey';
+            columns: ['owner_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       profiles: {
         Row: {
           created_at: string;

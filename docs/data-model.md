@@ -73,3 +73,15 @@ client loaded (`STALE_EXPENSE` otherwise). `voided_by` is always set to the call
 - Spending analytics (`domain/analytics.ts`) sum visible, non-voided expenses once each; settlements are never
   an input. "Paid" and "share" per person are shown separately.
 - Refunds/negative amounts are not supported in v1: correct an expense by editing or deleting it.
+
+## Lists (migration `20261121000300_lists.sql`)
+
+| Table        | Key columns                                                                                                                                           | Constraints                                                                                                   | Readable by                   | Writable by                                                                                                      |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `lists`      | `household_id`, `owner_user_id`, `visibility`, `kind` (todo/grocery/watch/ideas/packing/custom), `title`, `emoji`, `archived_at`, `client_request_id` | title 1–60 chars                                                                                              | owner; members if `household` | create as owner; edit if readable; **visibility only by owner** (trigger); delete only by owner (cascades items) |
+| `list_items` | `list_id`, `created_by`, `text`, `note`, `is_done`, `done_at/by`, `position` (text, `COLLATE "C"`), `details` jsonb, `revision`, `client_request_id`  | `details` validated per list kind by trigger (known keys, types, http(s) links, assignee is a member); ≤ 2 KB | follows the list              | follows the list; `created_by`, `done_by`, `revision` set by trigger                                             |
+
+- **Ordering:** fractional-index keys (`fractional-indexing`, CC0). Moving an item writes only that item.
+- **Concurrency:** text/note/details edits are sent with `.eq('revision', loaded)`; zero updated rows means a
+  conflict (`STALE_ITEM`) and the UI refetches instead of overwriting. Ticking is an absolute intent and applies
+  regardless of revision. Duplicate inserts are dropped via `client_request_id` (`upsert … ignoreDuplicates`).
