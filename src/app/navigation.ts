@@ -1,4 +1,4 @@
-import { House, ListChecks, Utensils, Wallet, type LucideIcon } from 'lucide-react';
+import { Globe2, House, ListChecks, Utensils, Wallet, type LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   href: string;
@@ -12,6 +12,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: '/food', label: 'Food', icon: Utensils },
   { href: '/money', label: 'Money', icon: Wallet },
   { href: '/lists', label: 'Lists', icon: ListChecks },
+  { href: '/world', label: 'World', icon: Globe2 },
 ];
 
 export function isActivePath(itemHref: string, currentPath: string): boolean {

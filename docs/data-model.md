@@ -118,3 +118,14 @@ client loaded (`STALE_EXPENSE` otherwise). `voided_by` is always set to the call
 `src/features/weight-goals/domain/` (Mifflin-St Jeor × activity factor; deficit = maintenance − eaten; remaining to
 target = target − eaten; intake projection at ~7,700 kcal/kg using complete days only; observed trend needs ≥ 3
 weigh-ins over ≥ 14 days).
+
+## Travel (migration `…0700_travel.sql`)
+
+| Table           | Key columns                                                                                                                                                                                          | Constraints                                          | Readable by                | Writable by                |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------- | -------------------------- |
+| `places`        | `household_id`, `created_by`, `visibility`, `name`, `locality`, `region`, `country_code` (ISO-2), `latitude`/`longitude`, `source` (manual/photon), `source_ref`, `is_wishlist`, `client_request_id` | coordinates in range                                 | creator; members if shared | creator; members if shared |
+| `visits`        | `place_id`, `started_on`, `ended_on` (null = single day), `note`, `client_request_id`                                                                                                                | end ≥ start                                          | follows the place          | follows the place          |
+| `visit_members` | (`visit_id`, `user_id`)                                                                                                                                                                              | members only; private place ⇒ creator only (trigger) | follows the visit          | follows the visit          |
+
+"Visited" = at least one visit; "wishlist" is a separate flag; "together" = a visit listing both people. RPCs:
+`create_place` (place + optional first visit, idempotent) and `add_visit` (visit + visitors, idempotent).

@@ -2,6 +2,7 @@ import { MoneySnapshotCard } from '@/features/expenses';
 import { InvitePartnerCard, useHousehold } from '@/features/household';
 import { ListsSnapshotCard } from '@/features/lists';
 import { FoodSnapshotCard } from '@/features/nutrition';
+import { TravelSnapshotCard } from '@/features/travel';
 import { formatLocalDate, todayIn } from '@/shared/lib/localDate';
 
 function greetingFor(hour: number): string {
@@ -35,6 +36,7 @@ export function HomePage() {
         <FoodSnapshotCard />
         <MoneySnapshotCard />
         <ListsSnapshotCard />
+        <TravelSnapshotCard />
       </div>
     </>
   );

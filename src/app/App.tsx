@@ -25,6 +25,9 @@ const ListsPage = lazyPage(() =>
 const ListDetailPage = lazyPage(() =>
   import('@/features/lists/pages/ListDetailPage').then((m) => m.ListDetailPage),
 );
+const WorldPage = lazyPage(() =>
+  import('@/features/travel/pages/WorldPage').then((m) => m.WorldPage),
+);
 const SettingsPage = lazyPage(() =>
   import('@/features/settings/SettingsPage').then((m) => m.SettingsPage),
 );
@@ -41,6 +44,7 @@ function SignedInRoutes({ userId }: { userId: string }) {
             <Route path="/money" component={MoneyPage} />
             <Route path="/lists" component={ListsPage} />
             <Route path="/lists/:id" component={ListDetailPage} />
+            <Route path="/world" component={WorldPage} />
             <Route path="/settings" component={SettingsPage} />
             <Route>
               <NotFound />

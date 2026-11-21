@@ -24,4 +24,7 @@ Settings (initially shared) and can be made private per meal. Weight data is pri
   expire after 72 hours, and creating a new link cancels the previous one.
 - Email addresses are not verified (see [ADR 0002](decisions/0002-auth-without-email.md)); sign-ups should be
   disabled after both partners join.
-- Nothing is sent to third parties. Future optional AI features will require explicit opt-in per use.
+- Place search sends only the typed search text to Photon (komoot, OpenStreetMap data); map tiles are fetched from
+  OpenFreeMap. No personal records are sent. Saved places keep their own coordinates, so neither service is needed
+  later.
+- No food data or photos are sent to any third party. Optional AI features (not built) must require explicit opt-in.

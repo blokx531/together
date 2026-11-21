@@ -817,6 +817,85 @@ export type Database = {
           },
         ];
       };
+      places: {
+        Row: {
+          client_request_id: string;
+          country_code: string | null;
+          country_name: string | null;
+          created_at: string;
+          created_by: string;
+          household_id: string;
+          id: string;
+          is_wishlist: boolean;
+          latitude: number;
+          locality: string | null;
+          longitude: number;
+          name: string;
+          note: string | null;
+          region: string | null;
+          source: string;
+          source_ref: string | null;
+          updated_at: string;
+          visibility: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          client_request_id: string;
+          country_code?: string | null;
+          country_name?: string | null;
+          created_at?: string;
+          created_by: string;
+          household_id: string;
+          id?: string;
+          is_wishlist?: boolean;
+          latitude: number;
+          locality?: string | null;
+          longitude: number;
+          name: string;
+          note?: string | null;
+          region?: string | null;
+          source: string;
+          source_ref?: string | null;
+          updated_at?: string;
+          visibility: string;
+        };
+        Update: {
+          client_request_id?: string;
+          country_code?: string | null;
+          country_name?: string | null;
+          created_at?: string;
+          created_by?: string;
+          household_id?: string;
+          id?: string;
+          is_wishlist?: boolean;
+          latitude?: number;
+          locality?: string | null;
+          longitude?: number;
+          name?: string;
+          note?: string | null;
+          region?: string | null;
+          source?: string;
+          source_ref?: string | null;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'places_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'places_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       profiles: {
         Row: {
           created_at: string;
@@ -930,6 +1009,89 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['user_id'];
+          },
+        ];
+      };
+      visit_members: {
+        Row: {
+          user_id: string;
+          visit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          user_id: string;
+          visit_id: string;
+        };
+        Update: {
+          user_id?: string;
+          visit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'visit_members_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'visit_members_visit_id_fkey';
+            columns: ['visit_id'];
+            isOneToOne: false;
+            referencedRelation: 'visits';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      visits: {
+        Row: {
+          client_request_id: string;
+          created_at: string;
+          created_by: string | null;
+          ended_on: string | null;
+          id: string;
+          note: string | null;
+          place_id: string;
+          started_on: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          client_request_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          ended_on?: string | null;
+          id?: string;
+          note?: string | null;
+          place_id: string;
+          started_on: string;
+          updated_at?: string;
+        };
+        Update: {
+          client_request_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          ended_on?: string | null;
+          id?: string;
+          note?: string | null;
+          place_id?: string;
+          started_on?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'visits_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'visits_place_id_fkey';
+            columns: ['place_id'];
+            isOneToOne: false;
+            referencedRelation: 'places';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -1062,6 +1224,17 @@ export type Database = {
     };
     Functions: {
       accept_household_invitation: { Args: { invitation_token: string }; Returns: string };
+      add_visit: {
+        Args: {
+          p_client_request_id: string;
+          p_ended_on?: string;
+          p_member_ids: string[];
+          p_note?: string;
+          p_place_id: string;
+          p_started_on: string;
+        };
+        Returns: string;
+      };
       copy_meal: {
         Args: {
           p_request_id: string;
@@ -1080,6 +1253,26 @@ export type Database = {
           invitation_id: string;
           token: string;
         }[];
+      };
+      create_place: {
+        Args: {
+          p_client_request_id: string;
+          p_country_code: string;
+          p_country_name: string;
+          p_is_wishlist: boolean;
+          p_latitude: number;
+          p_locality: string;
+          p_longitude: number;
+          p_name: string;
+          p_region: string;
+          p_source: string;
+          p_source_ref: string;
+          p_visibility: string;
+          p_visit_ended_on?: string;
+          p_visit_member_ids?: string[];
+          p_visit_started_on?: string;
+        };
+        Returns: string;
       };
       household_balances: {
         Args: Record<PropertyKey, never>;
