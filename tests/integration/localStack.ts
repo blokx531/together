@@ -1,4 +1,5 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from 'node:child_process';
+import { assertLocalTestUrl } from '../localTestEnv';
 
 export interface LocalStack {
   apiUrl: string;
@@ -8,15 +9,6 @@ export interface LocalStack {
 }
 
 type MaybeStack = { [K in keyof LocalStack]: string | undefined };
-
-const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
-
-function assertLocal(url: string): void {
-  const { hostname } = new URL(url);
-  if (!LOCAL_HOSTS.has(hostname)) {
-    throw new Error(`Refusing to run integration tests against non-local host "${hostname}".`);
-  }
-}
 
 function parseEnvOutput(output: string): Record<string, string> {
   const values: Record<string, string> = {};
@@ -40,10 +32,15 @@ export function readLocalStack(): LocalStack {
   };
   let stack: MaybeStack = fromEnv;
   if (!fromEnv.apiUrl || !fromEnv.publishableKey || !fromEnv.secretKey || !fromEnv.dbUrl) {
-    const output = execFileSync('npx', ['supabase', 'status', '-o', 'env'], {
+    const options: ExecFileSyncOptionsWithStringEncoding = {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
-    });
+    };
+    // Windows provides npx as a .cmd shim. Pass only fixed arguments through cmd.exe.
+    const output =
+      process.platform === 'win32'
+        ? execFileSync('cmd.exe', ['/d', '/s', '/c', 'npx --no supabase status -o env'], options)
+        : execFileSync('npx', ['--no', 'supabase', 'status', '-o', 'env'], options);
     const status = parseEnvOutput(output);
     stack = {
       apiUrl: status.API_URL,
@@ -56,7 +53,7 @@ export function readLocalStack(): LocalStack {
   if (!apiUrl || !publishableKey || !secretKey || !dbUrl) {
     throw new Error('Local Supabase is not running. Start it with `npm run db:start`.');
   }
-  assertLocal(apiUrl);
-  assertLocal(dbUrl);
+  assertLocalTestUrl(apiUrl, 'TEST_SUPABASE_URL', ['http:', 'https:']);
+  assertLocalTestUrl(dbUrl, 'TEST_DATABASE_URL', ['postgres:', 'postgresql:']);
   return { apiUrl, publishableKey, secretKey, dbUrl };
 }

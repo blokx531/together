@@ -25,3 +25,11 @@ documentation was read for confirmation (some hosts were unreachable from the bu
 | Map              | MapLibre GL (lazy route) + OpenFreeMap tiles (keyless)                     | Style URL configurable; saved places always listed as text                  |
 | Place search     | Photon (komoot public instance), debounced, ≥3 chars                       | Manual coordinates / tap-on-map                                             |
 | Country shapes   | Natural Earth 110m (public domain)                                         | —                                                                           |
+
+## Release fixes on 2026-11-21
+
+- Exa surfaced the PostgreSQL locking and Supabase RLS references. Existing meal slots are locked
+  for the duration of the write. The three RPCs retain invoker privileges. [PostgreSQL 17 locking](https://www.postgresql.org/docs/17/explicit-locking.html), [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).
+- The browser suite uses Vite's production-mode environment and a fresh dedicated server. JSON
+  export uses ordered range queries and exact counts. [Vite environment](https://vite.dev/guide/env-and-mode), [Playwright web server](https://playwright.dev/docs/test-webserver), [Supabase range requests](https://supabase.com/docs/reference/javascript/range).
+- Reviewed the separate roles, schema, and data steps for CLI disaster recovery. [Supabase backup and restore](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore).

@@ -183,13 +183,13 @@ export function FoodPage() {
           : null}
       </div>
       <AddFoodSheet
-        open={addingTo !== null}
+        open={isMine && addingTo !== null}
         date={date}
         mealType={addingTo ?? 'lunch'}
+        day={day}
         onClose={() => {
           setAddingTo(null);
         }}
-        onLogged={day.reload}
       />
       <MealItemSheet
         item={editing}

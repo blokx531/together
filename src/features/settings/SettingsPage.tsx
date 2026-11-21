@@ -207,9 +207,8 @@ function ExportCard() {
   return (
     <Card title="Your data">
       <p className="mb-3 text-sm text-ink-muted">
-        Download everything you can see (your records and what your partner shares) as a JSON file.
-        The free database plan has no backups, so keep an occasional copy somewhere private. Money
-        has a CSV export on the Money page.
+        Download your records and records your partner shares as a JSON file. Keep the file
+        somewhere private. The Money page also offers CSV export.
       </p>
       <FormError message={exportAction.error?.message} />
       <Button

@@ -4,6 +4,10 @@ All tables live in `public`, have RLS enabled, and are granted to `authenticated
 has no table privileges). Helper functions used by policies live in the non-exposed `private` schema and are
 `SECURITY DEFINER` with an empty `search_path`. Migrations: `supabase/migrations/`.
 
+Migration `…0900` removes automatic table privileges for browser roles on hosted projects and
+reapplies the app's explicit table and column grants. It also removes the automatic defaults for
+future public tables created by the application migration role.
+
 ## Ownership vocabulary
 
 | Term                       | Meaning                                                        |
@@ -104,6 +108,9 @@ client loaded (`STALE_EXPENSE` otherwise). `voided_by` is always set to the call
   item has them.
 - **RPCs:** `log_food` (idempotent), `copy_meal` (idempotent via uuid v5 of request id + item id), `move_meal` (merges),
   `set_day_complete`, `my_daily_intake(from, to)` (days with no food are absent, never zero).
+- **Visibility (migration `…0800`):** new profiles default to private meals. An existing meal keeps
+  its saved audience when adding food. Log, copy, and move reject a destination with a different
+  audience, and the database holds the destination row lock until the write completes.
 
 ## Weight & goals (migration `…0600_weight_goals.sql`)
 

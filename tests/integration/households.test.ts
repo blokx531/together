@@ -10,6 +10,35 @@ import {
 } from './helpers';
 
 describe('profiles', () => {
+  it('limits database grants to the intended signed-in table and column privileges', async () => {
+    const rows = await withDb(async (db) => {
+      const result = await db.query<{
+        anon_meals: boolean;
+        invitation_hash: boolean;
+        invitation_status: boolean;
+        update_user_id: boolean;
+        update_name: boolean;
+      }>(`
+        select
+          has_table_privilege('anon', 'public.meals', 'SELECT') as anon_meals,
+          has_column_privilege('authenticated', 'public.household_invitations', 'token_hash', 'SELECT') as invitation_hash,
+          has_column_privilege('authenticated', 'public.household_invitations', 'expires_at', 'SELECT') as invitation_status,
+          has_column_privilege('authenticated', 'public.profiles', 'user_id', 'UPDATE') as update_user_id,
+          has_column_privilege('authenticated', 'public.profiles', 'display_name', 'UPDATE') as update_name
+      `);
+      return result.rows;
+    });
+    expect(rows).toEqual([
+      {
+        anon_meals: false,
+        invitation_hash: false,
+        invitation_status: true,
+        update_user_id: false,
+        update_name: true,
+      },
+    ]);
+  });
+
   it('creates a profile with the sign-up display name and no email column', async () => {
     const user = await createTestUser('Meera');
     const { data, error } = await user.client
@@ -20,6 +49,7 @@ describe('profiles', () => {
     expect(error).toBeNull();
     expect(data?.display_name).toBe('Meera');
     expect(data?.time_zone).toBe('Asia/Kolkata');
+    expect(data?.default_meal_visibility).toBe('private');
     expect(Object.keys(data ?? {})).not.toContain('email');
   });
 

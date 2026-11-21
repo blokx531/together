@@ -8,10 +8,25 @@
 
 Integration tests create real users through the local Auth admin API, sign in with a password, and call the REST API
 exactly like the app does. A superuser `pg` connection is used only for fixture manipulation (e.g. expiring an invite).
-Both refuse non-local hosts. E2E tests run the **production build** via `vite preview`, use role/label selectors and
-Playwright's auto-waiting (no sleeps), and create fresh synthetic accounts (`*@example.test`) per test.
+Both refuse non-local Supabase URLs. Playwright passes the validated production-mode variables to a dedicated
+build under `node_modules/.cache/together-e2e` and requires a fresh preview server. It uses role/label selectors,
+auto-waiting, and synthetic accounts (`*@example.test`).
 
-## Latest results (actual runs, 2026-11-21, in the cloud build container)
+The release-fix tests cover mismatched and simultaneous meal writes, private-to-shared copy and move,
+private-by-default signup, and partner access after adding to an existing private meal. Export tests cover
+multiple ordered pages, partial results when a count changes, and 1,001 rows under real RLS in the local suite.
+
+## Release-fix verification on Windows (2026-11-21)
+
+- 156 unit tests passed. Typecheck, lint, formatting with checkout line-ending detection, and the
+  production build passed.
+- All migrations and the meal visibility checks passed in disposable PostgreSQL 18.7 with synthetic
+  Auth identities. Edge passed the Food conflict/retry smoke with controlled API responses on both
+  viewports. All four checked-in PWA manifest and offline-shell browser cases passed in Edge.
+- The disposable Supabase stack, authenticated Playwright journeys, and restore rehearsal still
+  need a Docker-enabled runner. See [Progress](progress.md) for the next verification steps.
+
+## Baseline results in the cloud build container (2026-11-21)
 
 | Suite                                                       | Result                                                                  |
 | ----------------------------------------------------------- | ----------------------------------------------------------------------- |

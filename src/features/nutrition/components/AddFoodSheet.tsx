@@ -4,14 +4,14 @@ import { useHousehold } from '@/features/household';
 import type { LocalDate } from '@/shared/lib/localDate';
 import { newRequestId } from '@/shared/lib/requestId';
 import { useAsyncAction } from '@/shared/lib/useAsyncAction';
-import { useResource } from '@/shared/lib/useResource';
+import { useResource, type Resource } from '@/shared/lib/useResource';
 import { Button } from '@/shared/ui/Button';
 import { FormError, SelectField, TextField } from '@/shared/ui/Field';
 import { SegmentedControl } from '@/shared/ui/SegmentedControl';
 import { Sheet } from '@/shared/ui/Sheet';
 import { ErrorState, LoadingRows } from '@/shared/ui/States';
 import { useToast } from '@/shared/ui/Toast';
-import { logFood, recentFoods, searchFoods } from '../data/nutritionApi';
+import { logFood, recentFoods, searchFoods, type DayLog } from '../data/nutritionApi';
 import { kcalForQuantity } from '../domain/calories';
 import { MEAL_LABELS, MEAL_TYPES, type Food, type StandardMealType } from '../domain/types';
 import { CustomFoodForm } from './CustomFoodForm';
@@ -21,15 +21,15 @@ interface AddFoodSheetProps {
   open: boolean;
   date: LocalDate;
   mealType: StandardMealType;
+  day: Resource<DayLog>;
   onClose: () => void;
-  onLogged: () => void;
 }
 
-export function AddFoodSheet({ open, date, mealType, onClose, onLogged }: AddFoodSheetProps) {
+export function AddFoodSheet({ open, date, mealType, day, onClose }: AddFoodSheetProps) {
   return (
     <Sheet open={open} title="Add food" onClose={onClose}>
       {open ? (
-        <AddFoodFlow date={date} initialMealType={mealType} onClose={onClose} onLogged={onLogged} />
+        <AddFoodFlow date={date} initialMealType={mealType} day={day} onClose={onClose} />
       ) : null}
     </Sheet>
   );
@@ -105,13 +105,13 @@ function FoodResults({ query, onSelect }: { query: string; onSelect: (food: Food
 function AddFoodFlow({
   date,
   initialMealType,
+  day,
   onClose,
-  onLogged,
 }: {
   date: LocalDate;
   initialMealType: StandardMealType;
+  day: Resource<DayLog>;
   onClose: () => void;
-  onLogged: () => void;
 }) {
   const household = useHousehold();
   const toast = useToast();
@@ -119,10 +119,16 @@ function AddFoodFlow({
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query.trim());
   const [mealType, setMealType] = useState(initialMealType);
-  const [visibility, setVisibility] = useState(household.defaultMealVisibility);
+  const [newMealVisibility, setNewMealVisibility] = useState(household.defaultMealVisibility);
   const [portion, setPortion] = useState<Portion>({ mode: 'amount', amountInput: '100' });
   const [requestId, setRequestId] = useState(newRequestId);
   const log = useAsyncAction(logFood);
+  const existingMeal =
+    day.status === 'success'
+      ? day.data.meals.find((meal) => meal.mealType === mealType && meal.customLabel === '')
+      : undefined;
+  const visibility = existingMeal?.visibility ?? newMealVisibility;
+  const sharedLabel = household.partner ? 'Both' : 'Shared';
 
   const selectFood = (food: Food) => {
     setPortion(defaultPortion(food.servings, food.basisUnit));
@@ -153,7 +159,7 @@ function AddFoodFlow({
     const quantity = portionQuantity(portion, food.servings);
     const serving = portion.mode === 'serving' ? food.servings[portion.servingIndex] : undefined;
     const onAdd = async () => {
-      if (quantity === null) return;
+      if (quantity === null || day.status !== 'success' || day.isRefreshing) return;
       const result = await log.run({
         requestId,
         date,
@@ -167,10 +173,13 @@ function AddFoodFlow({
       });
       if (result?.ok) {
         toast.show(`Added to ${MEAL_LABELS[mealType].toLowerCase()}`, { tone: 'success' });
-        onLogged();
+        day.reload();
         setRequestId(newRequestId());
+        setNewMealVisibility(household.defaultMealVisibility);
         setQuery('');
         setStep({ kind: 'search' });
+      } else if (result?.error.code === 'STALE_MEAL_VISIBILITY') {
+        day.reload();
       }
     };
     return (
@@ -212,7 +221,11 @@ function AddFoodFlow({
             value={mealType}
             onChange={(event) => {
               const next = MEAL_TYPES.find((m) => m === event.target.value);
-              if (next) setMealType(next);
+              if (next) {
+                setMealType(next);
+                setNewMealVisibility(household.defaultMealVisibility);
+                log.reset();
+              }
             }}
           >
             {MEAL_TYPES.map((type) => (
@@ -221,21 +234,44 @@ function AddFoodFlow({
               </option>
             ))}
           </SelectField>
-          {household.partner ? (
-            <SegmentedControl
-              label="Visible to"
-              className="self-end"
-              options={[
-                { value: 'household', label: 'Both' },
-                { value: 'private', label: 'Only me' },
-              ]}
-              value={visibility}
-              onChange={setVisibility}
-            />
-          ) : null}
+          {day.status === 'success' &&
+            (existingMeal ? (
+              <p
+                className="self-end rounded-control bg-surface-2 px-3 py-2 text-sm"
+                aria-live="polite"
+              >
+                Visible to {visibility === 'private' ? 'only you' : 'your shared space'}
+              </p>
+            ) : (
+              <SegmentedControl
+                label="Visible to"
+                className="self-end"
+                options={[
+                  { value: 'household', label: sharedLabel },
+                  { value: 'private', label: 'Only me' },
+                ]}
+                value={visibility}
+                onChange={setNewMealVisibility}
+              />
+            ))}
         </div>
+        {day.status === 'error' ? <ErrorState error={day.error} onRetry={day.reload} /> : null}
+        {day.status === 'loading' || day.isRefreshing ? (
+          <p role="status" className="text-sm text-ink-muted">
+            Checking meal visibility…
+          </p>
+        ) : null}
+        {!household.partner && visibility === 'household' ? (
+          <p className="text-sm text-ink-muted">A future partner can see shared meals.</p>
+        ) : null}
         <FormError
-          message={quantity === null ? 'Enter an amount greater than zero.' : log.error?.message}
+          message={
+            log.error?.code === 'STALE_MEAL_VISIBILITY'
+              ? 'Meal visibility changed. Review who can see this meal and try again.'
+              : quantity === null
+                ? 'Enter an amount greater than zero.'
+                : log.error?.message
+          }
         />
         <div className="flex gap-2">
           <Button variant="secondary" onClick={onClose}>
@@ -244,7 +280,7 @@ function AddFoodFlow({
           <Button
             className="flex-1"
             isLoading={log.isPending}
-            disabled={quantity === null}
+            disabled={quantity === null || day.status !== 'success' || day.isRefreshing}
             onClick={() => void onAdd()}
           >
             Add to {MEAL_LABELS[mealType].toLowerCase()}
