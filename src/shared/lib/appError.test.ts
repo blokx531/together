@@ -12,6 +12,15 @@ describe('toAppError', () => {
     expect(error.code).toBe('INVITE_EXPIRED');
   });
 
+  it('treats STALE_* codes as conflicts and NOT_FOUND as missing', () => {
+    expect(toAppError({ message: 'STALE_EXPENSE', code: 'P0001' })).toMatchObject({
+      kind: 'conflict',
+      code: 'STALE_EXPENSE',
+    });
+    expect(toAppError({ message: 'NOT_FOUND', code: 'P0001' }).kind).toBe('not_found');
+    expect(toAppError({ message: 'NOT_ALLOWED', code: '42501' }).kind).toBe('forbidden');
+  });
+
   it('maps RLS / privilege failures to forbidden', () => {
     expect(toAppError({ message: 'permission denied for table x', code: '42501' }).kind).toBe(
       'forbidden',

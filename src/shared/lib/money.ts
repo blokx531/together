@@ -48,3 +48,12 @@ export function paiseToInputValue(paise: number): string {
   const rest = Math.abs(paise % PAISE_PER_RUPEE);
   return rest === 0 ? String(rupees) : `${rupees}.${String(rest).padStart(2, '0')}`;
 }
+
+/** Exact decimal rupees for exports: 120050 -> "1200.50". */
+export function paiseToDecimalString(paise: number): string {
+  const sign = paise < 0 ? '-' : '';
+  const absolute = Math.abs(paise);
+  const rupees = Math.trunc(absolute / PAISE_PER_RUPEE);
+  const rest = absolute % PAISE_PER_RUPEE;
+  return `${sign}${rupees}.${String(rest).padStart(2, '0')}`;
+}

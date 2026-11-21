@@ -64,6 +64,12 @@ function kindFromPostgresCode(code: string): AppErrorKind | null {
   }
 }
 
+function domainCodeKind(domainCode: string): AppErrorKind | null {
+  if (domainCode.startsWith('STALE_')) return 'conflict';
+  if (domainCode === 'NOT_FOUND') return 'not_found';
+  return null;
+}
+
 function isNetworkFailure(message: string, name: string): boolean {
   return (
     name === 'AbortError' ||
@@ -81,11 +87,8 @@ export function toAppError(error: unknown): AppError {
 
   if (isNetworkFailure(message, name)) return new AppError('network', DEFAULT_MESSAGES.network);
   if (DOMAIN_CODE.test(message)) {
-    return new AppError(
-      kindFromPostgresCode(code) ?? 'validation',
-      DEFAULT_MESSAGES.validation,
-      message,
-    );
+    const kind = domainCodeKind(message) ?? kindFromPostgresCode(code) ?? 'validation';
+    return new AppError(kind, DEFAULT_MESSAGES[kind], message);
   }
   const kind = kindFromPostgresCode(code) ?? (status === 401 ? 'auth' : 'unknown');
   return new AppError(kind, DEFAULT_MESSAGES[kind], code || null);

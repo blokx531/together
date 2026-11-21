@@ -1,3 +1,4 @@
+import { MoneySnapshotCard } from '@/features/expenses';
 import { InvitePartnerCard, useHousehold } from '@/features/household';
 import { formatLocalDate, todayIn } from '@/shared/lib/localDate';
 
@@ -27,7 +28,10 @@ export function HomePage() {
           {greetingFor(hourIn(household.timeZone, now))}, {household.me.displayName}
         </h1>
       </header>
-      <div className="flex flex-col gap-4">{household.partner ? null : <InvitePartnerCard />}</div>
+      <div className="flex flex-col gap-4">
+        {household.partner ? null : <InvitePartnerCard />}
+        <MoneySnapshotCard />
+      </div>
     </>
   );
 }

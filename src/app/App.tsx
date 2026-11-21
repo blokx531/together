@@ -10,6 +10,9 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { lazyPage } from './lazyPage';
 
 const HomePage = lazyPage(() => import('@/features/dashboard/HomePage').then((m) => m.HomePage));
+const MoneyPage = lazyPage(() =>
+  import('@/features/expenses/pages/MoneyPage').then((m) => m.MoneyPage),
+);
 const SettingsPage = lazyPage(() =>
   import('@/features/settings/SettingsPage').then((m) => m.SettingsPage),
 );
@@ -21,6 +24,7 @@ function SignedInRoutes({ userId }: { userId: string }) {
         <Suspense fallback={<LoadingRows label="Loading page" />}>
           <Switch>
             <Route path="/" component={HomePage} />
+            <Route path="/money" component={MoneyPage} />
             <Route path="/settings" component={SettingsPage} />
             <Route>
               <NotFound />

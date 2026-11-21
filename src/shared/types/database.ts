@@ -3,6 +3,182 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      expense_revisions: {
+        Row: {
+          change: string;
+          changed_by: string | null;
+          created_at: string;
+          expense_id: string;
+          id: string;
+          previous: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          change: string;
+          changed_by?: string | null;
+          created_at?: string;
+          expense_id: string;
+          id?: string;
+          previous: NonNullable<Json>;
+        };
+        Update: {
+          change?: string;
+          changed_by?: string | null;
+          created_at?: string;
+          expense_id?: string;
+          id?: string;
+          previous?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'expense_revisions_changed_by_fkey';
+            columns: ['changed_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'expense_revisions_expense_id_fkey';
+            columns: ['expense_id'];
+            isOneToOne: false;
+            referencedRelation: 'expenses';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      expense_splits: {
+        Row: {
+          expense_id: string;
+          percent_basis_points: number | null;
+          share_paise: number;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          expense_id: string;
+          percent_basis_points?: number | null;
+          share_paise: number;
+          user_id: string;
+        };
+        Update: {
+          expense_id?: string;
+          percent_basis_points?: number | null;
+          share_paise?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'expense_splits_expense_id_fkey';
+            columns: ['expense_id'];
+            isOneToOne: false;
+            referencedRelation: 'expenses';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'expense_splits_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
+      expenses: {
+        Row: {
+          amount_paise: number;
+          category: string;
+          client_request_id: string;
+          created_at: string;
+          created_by: string;
+          currency: string;
+          household_id: string;
+          id: string;
+          note: string | null;
+          payer_user_id: string;
+          scope: string;
+          spent_on: string;
+          split_method: string;
+          title: string;
+          updated_at: string;
+          version: number;
+          visibility: string;
+          voided_at: string | null;
+          voided_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_paise: number;
+          category: string;
+          client_request_id: string;
+          created_at?: string;
+          created_by: string;
+          currency?: string;
+          household_id: string;
+          id?: string;
+          note?: string | null;
+          payer_user_id: string;
+          scope: string;
+          spent_on: string;
+          split_method: string;
+          title: string;
+          updated_at?: string;
+          version?: number;
+          visibility: string;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Update: {
+          amount_paise?: number;
+          category?: string;
+          client_request_id?: string;
+          created_at?: string;
+          created_by?: string;
+          currency?: string;
+          household_id?: string;
+          id?: string;
+          note?: string | null;
+          payer_user_id?: string;
+          scope?: string;
+          spent_on?: string;
+          split_method?: string;
+          title?: string;
+          updated_at?: string;
+          version?: number;
+          visibility?: string;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'expenses_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'expenses_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'expenses_payer_user_id_fkey';
+            columns: ['payer_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'expenses_voided_by_fkey';
+            columns: ['voided_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       household_invitations: {
         Row: {
           created_at: string;
@@ -160,6 +336,94 @@ export type Database = {
         };
         Relationships: [];
       };
+      settlements: {
+        Row: {
+          amount_paise: number;
+          client_request_id: string;
+          created_at: string;
+          created_by: string;
+          currency: string;
+          from_user_id: string;
+          household_id: string;
+          id: string;
+          note: string | null;
+          settled_on: string;
+          to_user_id: string;
+          updated_at: string;
+          voided_at: string | null;
+          voided_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_paise: number;
+          client_request_id: string;
+          created_at?: string;
+          created_by: string;
+          currency?: string;
+          from_user_id: string;
+          household_id: string;
+          id?: string;
+          note?: string | null;
+          settled_on: string;
+          to_user_id: string;
+          updated_at?: string;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Update: {
+          amount_paise?: number;
+          client_request_id?: string;
+          created_at?: string;
+          created_by?: string;
+          currency?: string;
+          from_user_id?: string;
+          household_id?: string;
+          id?: string;
+          note?: string | null;
+          settled_on?: string;
+          to_user_id?: string;
+          updated_at?: string;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'settlements_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'settlements_from_user_id_fkey';
+            columns: ['from_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'settlements_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'settlements_to_user_id_fkey';
+            columns: ['to_user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+          {
+            foreignKeyName: 'settlements_voided_by_fkey';
+            columns: ['voided_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -175,6 +439,17 @@ export type Database = {
           token: string;
         }[];
       };
+      household_balances: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          net_paise: number;
+          paid_paise: number;
+          settlements_paid_paise: number;
+          settlements_received_paise: number;
+          share_paise: number;
+          user_id: string;
+        }[];
+      };
       preview_household_invitation: {
         Args: { invitation_token: string };
         Returns: {
@@ -183,7 +458,44 @@ export type Database = {
           inviter_name: string;
         }[];
       };
+      record_settlement: {
+        Args: {
+          p_amount_paise: number;
+          p_client_request_id: string;
+          p_from_user_id: string;
+          p_note: string;
+          p_settled_on: string;
+          p_to_user_id: string;
+        };
+        Returns: string;
+      };
       revoke_household_invitation: { Args: { target_invitation_id: string }; Returns: undefined };
+      save_expense: {
+        Args: {
+          p_amount_paise: number;
+          p_category: string;
+          p_client_request_id: string;
+          p_expected_version?: number;
+          p_expense_id?: string;
+          p_note: string;
+          p_payer_user_id: string;
+          p_scope: string;
+          p_spent_on: string;
+          p_split_method: string;
+          p_splits: Json;
+          p_title: string;
+          p_visibility: string;
+        };
+        Returns: string;
+      };
+      set_expense_voided: {
+        Args: { p_expected_version: number; p_expense_id: string; p_voided: boolean };
+        Returns: undefined;
+      };
+      set_settlement_voided: {
+        Args: { p_settlement_id: string; p_voided: boolean };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

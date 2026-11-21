@@ -42,3 +42,34 @@ is stored in `public`.
 | `private.current_household_id()`            | The caller's household id (or null)              |
 | `private.is_household_member(household_id)` | Is the caller a member of that household?        |
 | `private.is_self_or_partner(user_id)`       | Is that user the caller or the caller's partner? |
+
+## Money (migration `20261121000200_money.sql`)
+
+| Table               | Key columns                                                                                                                                                                                                                                               | Constraints                                                                                                        | Readable by                                              | Writable by                                                                                            |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `expenses`          | `household_id`, `created_by`, `payer_user_id`, `scope` (personal/shared), `visibility` (private/household), `split_method`, `amount_paise` bigint, `currency` (INR), `category`, `spent_on` date, `client_request_id` (unique), `version`, `voided_at/by` | amount 1 paisa – ₹10 crore; shared ⇒ household-visible; personal ⇔ method `personal`; category list                | members, except private personal expenses (creator only) | create as self via `save_expense`; shared: either member; personal: creator only; never deleted (void) |
+| `expense_splits`    | (`expense_id`, `user_id`) PK, `share_paise`, `percent_basis_points`                                                                                                                                                                                       | share ≥ 0; **sum = amount** (deferred constraint trigger); users must be members; personal = one row for the payer | follows the expense                                      | follows the expense (RPC replaces all rows atomically)                                                 |
+| `expense_revisions` | `expense_id`, `changed_by`, `change` (update/void/restore), `previous` jsonb                                                                                                                                                                              | written only by trigger                                                                                            | follows the expense                                      | nobody                                                                                                 |
+| `settlements`       | `from_user_id`, `to_user_id`, `amount_paise`, `settled_on`, `client_request_id` (unique), `voided_at/by`                                                                                                                                                  | distinct people, both members                                                                                      | members                                                  | create as self via `record_settlement`; void via `set_settlement_voided`                               |
+
+`version` is bumped by trigger on every update; `save_expense`/`set_expense_voided` require the version the
+client loaded (`STALE_EXPENSE` otherwise). `voided_by` is always set to the caller by trigger (cannot be spoofed).
+
+### Money RPCs (all `SECURITY INVOKER`, so RLS still applies to every statement)
+
+| Function                                  | Behaviour                                                                                                                                                     |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `save_expense(...)`                       | Create (idempotent per `p_client_request_id`, including concurrent duplicates) or update with optimistic concurrency; replaces splits in the same transaction |
+| `set_expense_voided(id, version, voided)` | Void or restore; balances exclude voided expenses                                                                                                             |
+| `record_settlement(...)`                  | Idempotent per request id                                                                                                                                     |
+| `set_settlement_voided(id, voided)`       | Void or restore a settlement                                                                                                                                  |
+| `household_balances()`                    | Per member: paid − shares on live shared expenses + settlements paid − settlements received. Sums to zero                                                     |
+
+### Calculation rules
+
+- Equal and percentage splits allocate in integer paise; the leftover paisa goes to the larger fractional
+  remainder, ties to the payer (`src/features/expenses/domain/splits.ts`). The database only checks that the
+  shares add up; the allocation choice is the user's.
+- Spending analytics (`domain/analytics.ts`) sum visible, non-voided expenses once each; settlements are never
+  an input. "Paid" and "share" per person are shown separately.
+- Refunds/negative amounts are not supported in v1: correct an expense by editing or deleting it.

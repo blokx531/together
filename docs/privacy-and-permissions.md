@@ -13,7 +13,9 @@ assert what each can read and change.
 | Household name and members | read, rename                      | read, rename | nothing                                      |
 | Invitations                | see status; create/revoke via app | same         | nothing; token hash never readable by anyone |
 
-Each new feature adds rows to this table when it ships (meals, weight, expenses, lists, places).
+Each new feature adds rows to this table when it ships.
+
+Personal expenses default to **private**; sharing one is an explicit checkbox.
 
 ## Consent and defaults
 
